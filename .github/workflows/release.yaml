@@ -1,0 +1,63 @@
+name: Upload tagged commit to PyPI
+on:
+  push:
+    tags:
+      - "*.*.**"
+jobs:
+  get_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ steps.get_branch_name.outputs.name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get branch name
+        id: get_branch_name
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=$(echo "$raw" | grep "origin/main" | sed "s|origin/||" | xargs)
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    needs: get_branch
+    if: needs.get_branch.outputs.branch_name == 'main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python3 -m
+          pip install
+          build
+          --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+  publish-to-pypi:
+    name: >-
+      Publish Python distribution to PyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ga4gh-cat-vrs
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
