@@ -31,7 +31,10 @@ keywords = [
 ]
 requires-python = ">=3.10"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "ga4gh.vrs~=2.0.0-a7",
+    "pydantic==2.*",
+]
 
 [project.optional-dependencies]
 dev = [
