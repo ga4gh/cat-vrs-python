@@ -7,9 +7,32 @@ the GA4GH website for more information.
 from enum import Enum
 from typing import Literal
 
-from ga4gh.core import core_models
-from ga4gh.vrs import models
+from ga4gh.core.entity_models import IRI, _DomainEntity
+from ga4gh.vrs.models import (
+    Adjacency,
+    Allele,
+    CisPhasedBlock,
+    CopyChange,
+    CopyNumberChange,
+    CopyNumberCount,
+    DerivativeSequence,
+    Range,
+    SequenceLocation,
+    SequenceTerminus,
+)
 from pydantic import BaseModel, Field, RootModel, StrictStr
+
+
+class CatVrsType(str, Enum):
+    """Define CatVRS types"""
+
+    PROTEIN_SEQ_CONS = "ProteinSequenceConsequence"
+    CANONICAL_ALLELE = "CanonicalAllele"
+    CATEGORICAL_CNV = "CategoricalCnv"
+    DESCRIBED_VAR = "DescribedVariation"
+    NUMBER_COUNT = "NumberCount"
+    NUMBER_CHANGE = "NumberChange"
+    QUANTITY_VARIANCE = "QuantityVariance"
 
 
 class LocationMatchCharacteristic(str, Enum):
@@ -28,10 +51,22 @@ class LocationMatchCharacteristic(str, Enum):
     SUPERINTERVAL = "superinterval"
 
 
-class _CategoricalVariationBase(core_models._DomainEntity):
+class _CategoricalVariationBase(_DomainEntity):
     """Base class for Categorical Variation"""
 
-    members: list[models.Variation | core_models.IRI] | None = Field(
+    members: (
+        list[
+            Allele
+            | CisPhasedBlock
+            | Adjacency
+            | SequenceTerminus
+            | DerivativeSequence
+            | CopyNumberChange
+            | CopyNumberCount
+            | IRI,
+        ]
+        | None
+    ) = Field(
         None,
         description="A non-exhaustive list of VRS variation contexts that satisfy the constraints of this categorical variant.",
     )
@@ -47,11 +82,11 @@ class ProteinSequenceConsequence(_CategoricalVariationBase):
     altered codon(s).
     """
 
-    type: Literal["ProteinSequenceConsequence"] = Field(
-        "ProteinSequenceConsequence",
-        description="MUST be 'ProteinSequenceConsequence'.",
+    type: Literal[CatVrsType.PROTEIN_SEQ_CONS] = Field(
+        CatVrsType.PROTEIN_SEQ_CONS,
+        description=f"MUST be '{CatVrsType.PROTEIN_SEQ_CONS.value}'.",
     )
-    definingContext: models.Allele | core_models.IRI = Field(  # noqa: N815
+    definingContext: Allele | IRI = Field(  # noqa: N815
         ...,
         description="The `VRS Allele <https://vrs.ga4gh.org/en/2.0/terms_and_model.html#allele>`_  object that is congruent with (projects to the same codons) as alleles on other protein reference sequences.",
     )
@@ -66,10 +101,11 @@ class CanonicalAllele(_CategoricalVariationBase):
     associated cDNA transcript representations.
     """
 
-    type: Literal["CanonicalAllele"] = Field(
-        "CanonicalAllele", description="MUST be 'CanonicalAllele'."
+    type: Literal[CatVrsType.CANONICAL_ALLELE] = Field(
+        CatVrsType.CANONICAL_ALLELE,
+        description=f"MUST be '{CatVrsType.CANONICAL_ALLELE.value}'.",
     )
-    definingContext: models.Allele | core_models.IRI = Field(  # noqa: N815
+    definingContext: Allele | IRI = Field(  # noqa: N815
         ...,
         description="The `VRS Allele <https://vrs.ga4gh.org/en/2.0/terms_and_model.html#allele>`_ object that is congruent with variants on alternate reference sequences.",
     )
@@ -85,10 +121,11 @@ class CategoricalCnv(_CategoricalVariationBase):
     member CNVs.
     """
 
-    type: Literal["CategoricalCnv"] = Field(
-        "CategoricalCnv", description="MUST be 'CategoricalCnv'."
+    type: Literal[CatVrsType.CATEGORICAL_CNV] = Field(
+        CatVrsType.CATEGORICAL_CNV,
+        description=f"MUST be '{CatVrsType.CATEGORICAL_CNV.value}'.",
     )
-    location: models.Location = Field(
+    location: SequenceLocation = Field(
         ...,
         description="A `VRS Location <https://vrs.ga4gh.org/en/2.0/terms_and_model.html#location>`_ object that represents a sequence derived from that location, and is congruent with locations on alternate reference sequences.",
     )
@@ -96,11 +133,11 @@ class CategoricalCnv(_CategoricalVariationBase):
         None,
         description="The characteristics of a valid match between a contextual CNV location (the query) and the Categorical CNV location (the domain), when both query and domain are represented on the same reference sequence. An `exact` match requires the location of the query and domain to be identical. A `subinterval` match requires the query to be a subinterval of the domain. A `superinterval` match requires the query to be a superinterval of the domain. A `partial` match requires at least 1 residue of overlap between the query and domain.",
     )
-    copyChange: models.CopyChange | None = Field(  # noqa: N815
+    copyChange: CopyChange | None = Field(  # noqa: N815
         None,
         description="A representation of the change in copies of a sequence in a system. MUST be one of 'efo:0030069' (complete genomic loss), 'efo:0020073' (high-level loss), 'efo:0030068' (low-level loss), 'efo:0030067' (loss), 'efo:0030064' (regional base ploidy), 'efo:0030070' (gain), 'efo:0030071' (low-level gain), 'efo:0030072' (high-level gain).",
     )
-    copies: int | models.Range | None = Field(
+    copies: int | Range | None = Field(
         None, description="The integral number of copies of the subject in a system."
     )
 
@@ -113,8 +150,9 @@ class DescribedVariation(_CategoricalVariationBase):
     concept should be evaluated for matching variants.
     """
 
-    type: Literal["DescribedVariation"] = Field(
-        "DescribedVariation", description="MUST be 'DescribedVariation'."
+    type: Literal[CatVrsType.DESCRIBED_VAR] = Field(
+        CatVrsType.DESCRIBED_VAR,
+        description=f"MUST be '{CatVrsType.DESCRIBED_VAR.value}'.",
     )
     label: StrictStr = Field(
         ...,
@@ -148,10 +186,10 @@ class CategoricalVariation(RootModel):
 class NumberCount(BaseModel):
     """The absolute count of a discrete assayable unit (e.g. chromosome, gene, or sequence)."""
 
-    type: Literal["NumberCount"] = Field(
-        "NumberCount", description="MUST be 'NumberCount'."
+    type: Literal[CatVrsType.NUMBER_COUNT] = Field(
+        CatVrsType.NUMBER_COUNT, description=f"MUST be '{CatVrsType.NUMBER_COUNT}'."
     )
-    count: int | models.Range = Field(
+    count: int | Range = Field(
         ...,
         description="The integral quantity or quantity range of the subject in a system",
     )
@@ -162,10 +200,10 @@ class NumberChange(BaseModel):
     relative to a baseline quantity.
     """
 
-    type: Literal["NumberChange"] = Field(
-        "NumberChange", description="MUST be 'NumberChange'."
+    type: Literal[CatVrsType.NUMBER_CHANGE] = Field(
+        CatVrsType.NUMBER_CHANGE, description=f"MUST be '{CatVrsType.NUMBER_CHANGE}'."
     )
-    change: int | models.Range | models.CopyChange = Field(
+    change: int | Range | CopyChange = Field(
         ...,
         description="a quantitative or qualitative value of the measurement with respect to a baseline (0). If qualitative, must be one of 'efo:0030069' (complete genomic loss), 'efo:0020073' (high-level loss), 'efo:0030068' (low-level loss), 'efo:0030067' (loss), 'efo:0030064' (regional base ploidy), 'efo:0030070' (gain), 'efo:0030071' (low-level gain), 'efo:0030072' (high-level gain).",
     )
@@ -177,12 +215,13 @@ class QuantityVariance(BaseModel):
     a given biological level of variation.
     """
 
-    type: Literal["QuantityVariance"] = Field(
-        "QuantityVariance", description="MUST be 'QuantityVariance'."
+    type: Literal[CatVrsType.QUANTITY_VARIANCE] = Field(
+        CatVrsType.QUANTITY_VARIANCE,
+        description=f"MUST be '{CatVrsType.QUANTITY_VARIANCE}'.",
     )
 
 
-class CategoricalVariant(core_models._DomainEntity):
+class CategoricalVariant(_DomainEntity):
     """A top-level representation of a categorically-defined domain for variation across
     one or multiple biological levels in which individual contextual variants may be
     members of the domain.

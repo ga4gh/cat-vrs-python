@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from ga4gh.cat_vrs import models as cat_vrs_models
+from ga4gh.cat_vrs import cat_vrs_models
 
 ROOT_DIR = Path(__file__).parents[2]
 CAT_VRS_SCHEMA_DIR = ROOT_DIR / "submodules" / "cat_vrs" / "schema" / "catvrs" / "json"
