@@ -20,7 +20,7 @@ from ga4gh.vrs.models import (
     SequenceLocation,
     SequenceTerminus,
 )
-from pydantic import BaseModel, Field, RootModel, StrictStr
+from pydantic import BaseModel, Field, RootModel, StrictInt, StrictStr
 
 
 class CatVrsType(str, Enum):
@@ -137,7 +137,7 @@ class CategoricalCnv(_CategoricalVariationBase):
         None,
         description="A representation of the change in copies of a sequence in a system. MUST be one of 'efo:0030069' (complete genomic loss), 'efo:0020073' (high-level loss), 'efo:0030068' (low-level loss), 'efo:0030067' (loss), 'efo:0030064' (regional base ploidy), 'efo:0030070' (gain), 'efo:0030071' (low-level gain), 'efo:0030072' (high-level gain).",
     )
-    copies: int | Range | None = Field(
+    copies: StrictInt | Range | None = Field(
         None, description="The integral number of copies of the subject in a system."
     )
 
@@ -189,7 +189,7 @@ class NumberCount(BaseModel):
     type: Literal[CatVrsType.NUMBER_COUNT] = Field(
         CatVrsType.NUMBER_COUNT, description=f"MUST be '{CatVrsType.NUMBER_COUNT}'."
     )
-    count: int | Range = Field(
+    count: StrictInt | Range = Field(
         ...,
         description="The integral quantity or quantity range of the subject in a system",
     )
@@ -203,7 +203,7 @@ class NumberChange(BaseModel):
     type: Literal[CatVrsType.NUMBER_CHANGE] = Field(
         CatVrsType.NUMBER_CHANGE, description=f"MUST be '{CatVrsType.NUMBER_CHANGE}'."
     )
-    change: int | Range | CopyChange = Field(
+    change: StrictInt | Range | CopyChange = Field(
         ...,
         description="a quantitative or qualitative value of the measurement with respect to a baseline (0). If qualitative, must be one of 'efo:0030069' (complete genomic loss), 'efo:0020073' (high-level loss), 'efo:0030068' (low-level loss), 'efo:0030067' (loss), 'efo:0030064' (regional base ploidy), 'efo:0030070' (gain), 'efo:0030071' (low-level gain), 'efo:0030072' (high-level gain).",
     )
