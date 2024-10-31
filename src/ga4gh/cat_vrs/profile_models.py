@@ -4,16 +4,17 @@ See the `CatVar page <https://www.ga4gh.org/product/categorical-variation-catvar
 the GA4GH website for more information.
 """
 
-import logging
 from enum import Enum
 
 from ga4gh.cat_vrs.core_models import (
     CategoricalVariant,
     Constraint,
+    CopyChangeConstraint,
+    CopyCountConstraint,
     DefiningContextConstraint,
     Relation,
 )
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class CatVrsType(str, Enum):
@@ -31,23 +32,25 @@ class CatVrsType(str, Enum):
 class ProteinSequenceConsequenceProperties(BaseModel):
     """Cat-VRS Constraints found in Protein Sequence Consequences."""
 
-    constraints: DefiningContextConstraint
+    constraints: list[Constraint] = Field(..., min_length=1)
 
     @field_validator("constraints")
     @classmethod
-    def validate_constraints(
-        cls, v: DefiningContextConstraint
-    ) -> DefiningContextConstraint:
+    def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
         """Validate constraints property
 
         :param v: Constraints property to validate
+        :raises ValueError: If none of the ``relations`` contains
+            ``Relation.CODON_TRANSLATION.value`` exactly once.
         :return: Constraints property
         """
-        if v.relations and Relation.CODON_TRANSLATION not in v.relations:
-            logging.warning(
-                "`constraints.relations` is missing the following relation: %s.",
-                Relation.CODON_TRANSLATION.value,
-            )
+        if not any(
+            constraint.relations.count(Relation.CODON_TRANSLATION) == 1
+            for constraint in v
+        ):
+            err_msg = f"At least one `relations` in `constraints` must contain `{Relation.CODON_TRANSLATION.value}` exactly once."
+            raise ValueError(err_msg)
+
         return v
 
 
@@ -67,31 +70,29 @@ class ProteinSequenceConsequence(
 class CanonicalAlleleProperties(BaseModel):
     """Cat-VRS Constraints found in Canonical Alleles."""
 
-    constraints: DefiningContextConstraint
+    constraints: list[Constraint] = Field(..., min_length=1)
 
     @field_validator("constraints")
     @classmethod
-    def validate_constraints(
-        cls, v: DefiningContextConstraint
-    ) -> DefiningContextConstraint:
+    def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
         """Validate constraints property
 
         :param v: Constraints property to validate
+        :raises ValueError: If none of the ``relations`` contains both
+            ``Relation.SEQUENCE_LIFTOVER`` and ``Relation.TRANSCRIPT_PROJECTION``
+            exactly once.
         :return: Constraints property
         """
-        if v.relations:
-            required_relations = {
-                Relation.SEQUENCE_LIFTOVER,
-                Relation.TRANSCRIPT_PROJECTION,
-            }
-            relations = set(v.relations)
+        if not any(
+            (
+                constraint.relations.count(Relation.SEQUENCE_LIFTOVER) == 1
+                and constraint.relations.count(Relation.TRANSCRIPT_PROJECTION) == 1
+            )
+            for constraint in v
+        ):
+            err_msg = f"At least one `relations` in `constraints` must contain {Relation.SEQUENCE_LIFTOVER} and {Relation.TRANSCRIPT_PROJECTION} exactly once."
+            raise ValueError(err_msg)
 
-            if not required_relations.issubset(relations):
-                missing_relations = required_relations - relations
-                logging.warning(
-                    "`constraints.relations` is missing the following relations: %s.",
-                    missing_relations,
-                )
         return v
 
 
@@ -108,23 +109,44 @@ class CanonicalAllele(CanonicalAlleleProperties, CategoricalVariant):
 class CategoricalCnvProperties(BaseModel):
     """Cat-VRS Constraints found in CategoricalCnvs."""
 
-    constraints: Constraint
+    constraints: list[Constraint] = Field(..., min_length=1)
 
     @field_validator("constraints")
     @classmethod
-    def validate_constraints(
-        cls, v: DefiningContextConstraint
-    ) -> DefiningContextConstraint:
+    def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
         """Validate constraints property
 
         :param v: Constraints property to validate
+        :raises ValueError: If no ``DefiningContextConstraint`` with
+            ``Relation.SEQUENCE_LIFTOVER`` in ``relations`` is found in ``constraints``
+            or if neither ``CopyCountConstraint`` nor ``CopyChangeConstraint`` is found
+            in ``constraints``.
         :return: Constraints property
         """
-        if v.relations and Relation.SEQUENCE_LIFTOVER not in v.relations:
-            logging.warning(
-                "`constraints.relations` is missing the following relation: %s.",
-                Relation.SEQUENCE_LIFTOVER.value,
-            )
+        defining_context_found = False
+        copy_found = False
+
+        for constraint in v:
+            if not defining_context_found:
+                defining_context_found = (
+                    isinstance(constraint, DefiningContextConstraint)
+                    and constraint.relations
+                    and Relation.SEQUENCE_LIFTOVER in constraint.relations
+                )
+
+            if not copy_found:
+                copy_found = isinstance(
+                    constraint, CopyChangeConstraint | CopyCountConstraint
+                )
+
+        if not defining_context_found:
+            err_msg = f"At least one item in `constraints` must be a `DefiningContextConstraint`` and contain ``{Relation.SEQUENCE_LIFTOVER}` in `relations`."
+            raise ValueError(err_msg)
+
+        if not copy_found:
+            err_msg = "At least one item in `constraints` must be a `CopyCountConstraint` or a `CopyChangeConstraint`."
+            raise ValueError(err_msg)
+
         return v
 
 

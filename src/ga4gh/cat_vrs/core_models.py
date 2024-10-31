@@ -96,4 +96,4 @@ class CategoricalVariant(DomainEntity):
         None,
         description="A non-exhaustive list of VRS variation contexts that satisfy the constraints of this categorical variant.",
     )
-    constraints: list[Constraint] | None
+    constraints: list[Constraint] | None = None
