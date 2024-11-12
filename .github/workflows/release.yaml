@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/ga4gh-cat-vrs
+      url: https://pypi.org/p/ga4gh.cat_vrs
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
     steps:
