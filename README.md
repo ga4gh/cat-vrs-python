@@ -1,6 +1,7 @@
 # cat-vrs-python
 
-GA4GH Categorical Variation Representation Python Implementation
+**Cat-VRS-Python** provides Python language support and a reference implementation for the
+[GA4GH Categorical Variation Representation Specification (Cat-VRS)](https://github.com/ga4gh/cat-vrs).
 
 ## Information
 
