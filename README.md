@@ -9,7 +9,7 @@
 
 ## Releases
 
-[![gitHub tag](https://img.shields.io/github/v/tag/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/releases) [![pypi](https://img.shields.io/pypi/v/ga4gh.cat_vrs.svg)](https://pypi.org/project/ga4gh.cat_vrs/)
+[![gitHub tag](https://img.shields.io/github/v/tag/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/releases) [![pypi](https://img.shields.io/pypi/v/ga4gh.cat_vrs.svg)](https://pypi.org/project/ga4gh.cat_vrs/) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14226037.svg)](https://doi.org/10.5281/zenodo.14226037)
 
 ## Development
 
