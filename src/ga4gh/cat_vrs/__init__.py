@@ -1,5 +1,5 @@
 """Package for Cat-VRS Python implementation"""
 
-from . import profile_models as cat_vrs_models
+from . import models, recipes
 
-__all__ = ["cat_vrs_models"]
+__all__ = ["models", "recipes"]

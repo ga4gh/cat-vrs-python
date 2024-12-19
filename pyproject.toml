@@ -137,7 +137,8 @@ ignore = [
 # S101 - assert
 # B011 - assert-false
 "tests/*" = ["ANN001", "ANN2", "ANN102", "S101", "B011"]
-"src/ga4gh/cat_vrs/*models.py" = ["ANN102"]
+"src/ga4gh/cat_vrs/models.py" = ["ANN102", "N815"]
+"src/ga4gh/cat_vrs/recipes.py" = ["ANN102", "N815"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
