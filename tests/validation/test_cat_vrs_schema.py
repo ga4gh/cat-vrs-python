@@ -5,15 +5,15 @@ from enum import Enum
 from pathlib import Path
 
 import pytest
-from ga4gh.cat_vrs import core_models, profile_models
+from ga4gh.cat_vrs import models, recipes
 from pydantic import BaseModel
 
 
 class CatVrsSchema(str, Enum):
     """Enum for Cat VRS schema"""
 
-    CORE = "core"
-    PROFILES = "profiles"
+    CAT_VRS = "cat_vrs"
+    RECIPES = "recipes"
 
 
 class CatVrsSchemaMapping(BaseModel):
@@ -54,10 +54,10 @@ SUBMODULES_DIR = Path(__file__).parents[2] / "submodules" / "cat_vrs" / "schema"
 # Get core + profiles classes
 for child in SUBMODULES_DIR.iterdir():
     child_str = str(child)
-    if child_str.endswith(CatVrsSchema.CORE):
-        mapping_key = CatVrsSchema.CORE
-    elif child_str.endswith(CatVrsSchema.PROFILES):
-        mapping_key = CatVrsSchema.PROFILES
+    if child_str.endswith(CatVrsSchema.CAT_VRS):
+        mapping_key = CatVrsSchema.CAT_VRS
+    elif child_str.endswith(CatVrsSchema.RECIPES):
+        mapping_key = CatVrsSchema.RECIPES
     else:
         continue
 
@@ -69,8 +69,8 @@ for child in SUBMODULES_DIR.iterdir():
 @pytest.mark.parametrize(
     ("cat_vrs_schema", "pydantic_models"),
     [
-        (CatVrsSchema.CORE, core_models),
-        (CatVrsSchema.PROFILES, profile_models),
+        (CatVrsSchema.CAT_VRS, models),
+        (CatVrsSchema.RECIPES, recipes),
     ],
 )
 def test_schema_models_in_pydantic(cat_vrs_schema, pydantic_models):
@@ -85,8 +85,8 @@ def test_schema_models_in_pydantic(cat_vrs_schema, pydantic_models):
 @pytest.mark.parametrize(
     ("cat_vrs_schema", "pydantic_models"),
     [
-        (CatVrsSchema.CORE, core_models),
-        (CatVrsSchema.PROFILES, profile_models),
+        (CatVrsSchema.CAT_VRS, models),
+        (CatVrsSchema.RECIPES, recipes),
     ],
 )
 def test_schema_class_fields(cat_vrs_schema, pydantic_models):
