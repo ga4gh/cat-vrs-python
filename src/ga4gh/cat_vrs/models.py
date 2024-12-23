@@ -8,7 +8,6 @@ from enum import Enum
 from typing import Literal
 
 from ga4gh.core.models import (
-    Coding,
     ConceptMapping,
     Entity,
     MappableConcept,
@@ -82,14 +81,14 @@ class CopyChangeConstraint(BaseModel):
     type: Literal["CopyChangeConstraint"] = Field(
         "CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
     )
-    copyChange: Coding = Field(
+    copyChange: str = Field(
         ...,
         description="The relative assessment of the change in copies that members of this categorical variant satisfies.",
     )
 
     @field_validator("copyChange")
     @classmethod
-    def validate_copy_change(cls, v: Coding) -> Coding:
+    def validate_copy_change(cls, v: str) -> str:
         """Validate copyChange property
 
         :param v: copyChange value
@@ -97,9 +96,9 @@ class CopyChangeConstraint(BaseModel):
         :return: copyChange property
         """
         try:
-            CopyChange(v.code.root)
+            CopyChange(v)
         except ValueError as e:
-            err_msg = f"copyChange, {v.code.root}, not one of {[cc.value for cc in CopyChange]}"
+            err_msg = f"copyChange, {v}, not one of {[cc.value for cc in CopyChange]}"
             raise ValueError(err_msg) from e
         return v
 

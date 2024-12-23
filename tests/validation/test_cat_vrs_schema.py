@@ -1,4 +1,4 @@
-"""Test that Cat VRS-Python Pydantic models match corresponding schemas"""
+"""Test that Cat VRS-Python Pydantic models match corresponding JSON schemas"""
 
 import json
 from enum import Enum

@@ -45,18 +45,15 @@ class ProteinSequenceConsequence(CategoricalVariant):
         :return: Constraints property
         """
         if not any(
-            all(
-                (
-                    isinstance(constraint, DefiningAlleleConstraint),
-                    constraint.relations,
-                    sum(
-                        1
-                        for r in constraint.relations
-                        if r.primaryCode == Relation.TRANSLATES_FROM
-                    )
-                    == 1,
-                )
+            isinstance(constraint.root, DefiningAlleleConstraint)
+            and constraint.root.relations
+            and sum(
+                1
+                for r in constraint.root.relations
+                if r.primaryCode
+                and r.primaryCode.root == Relation.TRANSLATES_FROM.value
             )
+            == 1
             for constraint in v
         ):
             err_msg = f"Unable to find at least one constraint that is a `DefiningAlleleConstraint` and has exactly one `relation` where the `primaryCode` is '{Relation.TRANSLATES_FROM.value}'."
@@ -95,17 +92,19 @@ class CanonicalAllele(CategoricalVariant):
         """
         constraint = v[0]
 
-        if not isinstance(constraint, DefiningAlleleConstraint):
+        if not isinstance(constraint.root, DefiningAlleleConstraint):
             err_msg = "Constraint must be a `DefiningAlleleConstraint`."
             raise ValueError(err_msg)
 
-        if not constraint.relations:
+        if not constraint.root.relations:
             err_msg = "`relations` is required."
             raise ValueError(err_msg)
 
         if (
             sum(
-                1 for r in constraint.relations if r.primaryCode == Relation.LIFTOVER_TO
+                1
+                for r in constraint.root.relations
+                if r.primaryCode and r.primaryCode.root == Relation.LIFTOVER_TO.value
             )
             != 1
         ):
@@ -115,12 +114,12 @@ class CanonicalAllele(CategoricalVariant):
         if (
             sum(
                 1
-                for r in constraint.relations
-                if r.primaryCode == Relation.TRANSCRIBES_TO
+                for r in constraint.root.relations
+                if r.primaryCode and r.primaryCode.root == Relation.TRANSCRIBES_TO.value
             )
             != 1
         ):
-            err_msg = f"Must contain exactly one relation where `primaryCode` is '{Relation.TRANSCRIBES_TO.value}."
+            err_msg = f"Must contain exactly one relation where `primaryCode` is '{Relation.TRANSCRIBES_TO.value}'."
             raise ValueError(err_msg)
 
         return v
@@ -155,12 +154,17 @@ class CategoricalCnv(CategoricalVariant):
         copy_constr_found = False
 
         for constraint in v:
-            if not def_loc_constr_found:
-                def_loc_constr_found = (
-                    isinstance(constraint, DefiningLocationConstraint)
-                    and constraint.relations
-                    and Relation.LIFTOVER_TO in constraint.relations
-                )
+            constraint = constraint.root
+            if not def_loc_constr_found and isinstance(
+                constraint, DefiningLocationConstraint
+            ):
+                for r in constraint.relations:
+                    if (
+                        r.primaryCode
+                        and r.primaryCode.root == Relation.LIFTOVER_TO.value
+                    ):
+                        def_loc_constr_found = True
+                        continue
 
             if not copy_constr_found:
                 copy_constr_found = isinstance(
@@ -168,7 +172,7 @@ class CategoricalCnv(CategoricalVariant):
                 )
 
         if not def_loc_constr_found:
-            err_msg = f"Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is {Relation.LIFTOVER_TO.value}."
+            err_msg = f"Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'."
             raise ValueError(err_msg)
 
         if not copy_constr_found:
