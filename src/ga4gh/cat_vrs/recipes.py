@@ -150,19 +150,22 @@ class CategoricalCnv(CategoricalVariant):
         :return: Constraints property
         """
         def_loc_constr_found = False
+        def_loc_constr_valid = False
         copy_constr_found = False
 
         for constraint in v:
             constraint = constraint.root
-            if not def_loc_constr_found and isinstance(
+            if not def_loc_constr_valid and isinstance(
                 constraint, DefiningLocationConstraint
             ):
+                def_loc_constr_found = True
+
                 for r in constraint.relations:
                     if (
                         r.primaryCode
                         and r.primaryCode.root == Relation.LIFTOVER_TO.value
                     ):
-                        def_loc_constr_found = True
+                        def_loc_constr_valid = True
                         continue
 
             if not copy_constr_found:
@@ -172,6 +175,10 @@ class CategoricalCnv(CategoricalVariant):
 
         if not def_loc_constr_found:
             err_msg = f"Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'."
+            raise ValueError(err_msg)
+
+        if not def_loc_constr_valid:
+            err_msg = f"`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'"
             raise ValueError(err_msg)
 
         if not copy_constr_found:

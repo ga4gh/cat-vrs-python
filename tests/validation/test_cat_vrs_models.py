@@ -349,7 +349,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is 'liftover_to'.",
+        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCode` is 'liftover_to'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
