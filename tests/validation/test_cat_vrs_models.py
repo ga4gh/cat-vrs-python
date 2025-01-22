@@ -56,8 +56,11 @@ def test_copy_count_constraint():
     assert models.CopyCountConstraint(copies=2)
 
     # Invalid Copy Count Constraint
-    with pytest.raises(ValueError, match="The first integer must be less than or equal to the second integer."):
-        models.CopyCountConstraint(copies=[3,2])
+    with pytest.raises(
+        ValueError,
+        match="The first integer must be less than or equal to the second integer.",
+    ):
+        models.CopyCountConstraint(copies=[3, 2])
 
 
 def test_copy_change_constraint():
@@ -82,7 +85,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     )
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -117,7 +120,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[MappableConcept(label=models.Relation.LIFTOVER_TO.value)],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -132,7 +135,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                 relations=[
                     MappableConcept(primaryCode=code(models.Relation.LIFTOVER_TO.value))
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -152,7 +155,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -175,7 +178,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -218,7 +221,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -244,7 +247,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -267,7 +270,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
@@ -293,7 +296,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele=DUMMY_ALLELE_IRI
+                allele=DUMMY_ALLELE_IRI,
             )
         )
     ]
