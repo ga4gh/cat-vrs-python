@@ -50,6 +50,16 @@ def defining_loc_constr():
     )
 
 
+def test_copy_count_constraint():
+    """Test the CopyCountConstraint validator"""
+    # Valid Copy Count Constraint
+    assert models.CopyCountConstraint(copies=2)
+
+    # Invalid Copy Count Constraint
+    with pytest.raises(ValueError, match="The first integer must be less than or equal to the second integer."):
+        models.CopyCountConstraint(copies=[3,2])
+
+
 def test_copy_change_constraint():
     """Test the CopyChangeConstraint validator"""
     # Valid Copy Change
