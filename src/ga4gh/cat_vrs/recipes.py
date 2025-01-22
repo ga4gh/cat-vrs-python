@@ -140,11 +140,10 @@ class CategoricalCnv(CategoricalVariant):
     def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
         """Validate constraints property
 
-        Each constraint in ``constraints`` must satisfy ALL of the following
-        requirements:
-        1. Must contain a ``DefiningLocationConstraint`` where
-            a. ``relations`` property contains at least one relation where ``primaryCode = liftover_to``
-        2. Must contain a ``CopyCountConstraint`` or ``CopyChangeConstraint``
+        ``constraints`` must contain two constraints:
+            1. ``DefiningLocationConstraint`` where the ``relations`` property contains
+                at least one relation where ``primaryCode = liftover_to``
+            2. Either a ``CopyCountConstraint`` or ``CopyChangeCount``
 
         :param v: Constraints property to validate
         :raises ValueError: If constraints property does not satisfy the requirements
