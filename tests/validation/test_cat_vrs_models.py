@@ -340,7 +340,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     ):
         recipes.CategoricalCnv(**invalid_params)
 
-    # Invalid No CopyCountConstraint or CopyChangeConstraint
+    # Invalid No CopyCountConstraint and no CopyChangeConstraint provided
     invalid_params["constraints"] = [
         invalid_defining_loc_constr,
         defining_loc_constr,
