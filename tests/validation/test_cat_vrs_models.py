@@ -10,6 +10,8 @@ from ga4gh.core.models import (
 )
 from ga4gh.vrs.models import CopyChange
 
+DUMMY_ALLELE_IRI = "allele.json#/1"  # Valid IRI but does not reference anything
+
 
 def def_allele_constr_empty_relations(
     is_empty_list=True,
@@ -70,7 +72,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     )
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -105,7 +107,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[MappableConcept(label=models.Relation.LIFTOVER_TO.value)],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -120,7 +122,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                 relations=[
                     MappableConcept(primaryCode=code(models.Relation.LIFTOVER_TO.value))
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -140,7 +142,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -163,7 +165,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -206,7 +208,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -232,7 +234,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -255,7 +257,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSLATES_FROM.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
@@ -281,7 +283,7 @@ def test_canonical_allele(defining_loc_constr, members):
                         primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
                     ),
                 ],
-                allele="allele.json#/1",
+                allele=DUMMY_ALLELE_IRI
             )
         )
     ]
