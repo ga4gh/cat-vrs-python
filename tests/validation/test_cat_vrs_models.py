@@ -46,7 +46,7 @@ def defining_loc_constr():
             MappableConcept(primaryCode=code(models.Relation.LIFTOVER_TO.value))
         ],
         location="location.json#/1",
-        matchCharacteristic=MappableConcept(label="test"),
+        matchCharacteristic=MappableConcept(name="test"),
     )
 
 
@@ -119,7 +119,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[MappableConcept(label=models.Relation.LIFTOVER_TO.value)],
+                relations=[MappableConcept(name=models.Relation.LIFTOVER_TO.value)],
                 allele=DUMMY_ALLELE_IRI,
             )
         )

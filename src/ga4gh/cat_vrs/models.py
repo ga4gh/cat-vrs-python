@@ -8,13 +8,14 @@ from enum import Enum
 from typing import Literal
 
 from ga4gh.core.models import (
+    BaseModelForbidExtra,
     ConceptMapping,
     Entity,
     MappableConcept,
     iriReference,
 )
 from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
-from pydantic import BaseModel, Field, RootModel, field_validator
+from pydantic import Field, RootModel, field_validator
 
 
 class Relation(str, Enum):
@@ -27,7 +28,7 @@ class Relation(str, Enum):
     TRANSCRIBES_TO = "transcribes_to"
 
 
-class DefiningAlleleConstraint(BaseModel):
+class DefiningAlleleConstraint(BaseModelForbidExtra):
     """The defining allele and its associated relationships that are congruent with
     member variants.
     """
@@ -42,7 +43,7 @@ class DefiningAlleleConstraint(BaseModel):
     )
 
 
-class DefiningLocationConstraint(BaseModel):
+class DefiningLocationConstraint(BaseModelForbidExtra):
     """The defining location and its associated relationships that are congruent with
     member locations.
     """
@@ -61,7 +62,7 @@ class DefiningLocationConstraint(BaseModel):
     )
 
 
-class CopyCountConstraint(BaseModel):
+class CopyCountConstraint(BaseModelForbidExtra):
     """The exact or range of copies that members of this categorical variant must
     satisfy.
     """
@@ -75,7 +76,7 @@ class CopyCountConstraint(BaseModel):
     )
 
 
-class CopyChangeConstraint(BaseModel):
+class CopyChangeConstraint(BaseModelForbidExtra):
     """A representation of copy number change"""
 
     type: Literal["CopyChangeConstraint"] = Field(
@@ -114,7 +115,7 @@ class Constraint(RootModel):
     ) = Field(..., discriminator="type")
 
 
-class CategoricalVariant(Entity):
+class CategoricalVariant(Entity, BaseModelForbidExtra):
     """A representation of a categorically-defined domain for variation, in which
     individual Constraintual variation instances may be members of the domain.
     """
