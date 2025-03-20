@@ -38,7 +38,8 @@ class ProteinSequenceConsequence(CategoricalVariant):
         1. Must be a ``DefiningAlleleConstraint``
         2. Must have ``relations`` property that meets ALL of the following
         requirements:
-            a. Must contain exactly one relation where ``primaryCode = translates_from``
+            a. Must contain exactly one relation where ``primaryCoding.code = translates_from``
+               and ``primaryCoding.system = http://www.sequenceontology.org``
 
         :param v: Constraints property to validate
         :raises ValueError: If constraints property does not satisfy the requirements
@@ -50,13 +51,14 @@ class ProteinSequenceConsequence(CategoricalVariant):
             and sum(
                 1
                 for r in constraint.root.relations
-                if r.primaryCode
-                and r.primaryCode.root == Relation.TRANSLATES_FROM.value
+                if r.primaryCoding
+                and r.primaryCoding.code.root == Relation.TRANSLATES_FROM.value
+                and r.primaryCoding.system == "http://www.sequenceontology.org"
             )
             == 1
             for constraint in v
         ):
-            err_msg = f"Unable to find at least one constraint that is a `DefiningAlleleConstraint` and has exactly one `relation` where the `primaryCode` is '{Relation.TRANSLATES_FROM.value}'."
+            err_msg = f"Unable to find at least one constraint that is a `DefiningAlleleConstraint` and has exactly one `relation` where the `primaryCoding.code` is '{Relation.TRANSLATES_FROM.value}' and `primaryCoding.system` is 'http://www.sequenceontology.org'."
             raise ValueError(err_msg)
 
         return v
@@ -83,8 +85,8 @@ class CanonicalAllele(CategoricalVariant):
         1. Must be a ``DefiningAlleleConstraint``
         2. Must have ``relations`` property that meets ALL of the following
         requirements:
-            a. Must contain exactly one relation where ``primaryCode = liftover_to``
-            b. Must contain exactly one relation where ``primaryCode = transcribes_to``
+            a. Must contain exactly one relation where ``primaryCoding.code = liftover_to`` and ``primaryCoding.system == ga4gh-gks-term:allele-relation``
+            b. Must contain exactly one relation where ``primaryCoding.code = transcribes_to`` and ``primaryCoding.system == http://www.sequenceontology.org``
 
         :param v: Constraints property to validate
         :raises ValueError: If constraints property does not satisfy the requirements
@@ -104,22 +106,30 @@ class CanonicalAllele(CategoricalVariant):
             sum(
                 1
                 for r in constraint.root.relations
-                if r.primaryCode and r.primaryCode.root == Relation.LIFTOVER_TO.value
+                if r.primaryCoding
+                and (
+                    r.primaryCoding.code.root == Relation.LIFTOVER_TO.value
+                    and r.primaryCoding.system == "ga4gh-gks-term:allele-relation"
+                )
             )
             != 1
         ):
-            err_msg = f"Must contain exactly one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'."
+            err_msg = f"Must contain exactly one relation where `primaryCoding.code` is '{Relation.LIFTOVER_TO.value}' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'."
             raise ValueError(err_msg)
 
         if (
             sum(
                 1
                 for r in constraint.root.relations
-                if r.primaryCode and r.primaryCode.root == Relation.TRANSCRIBES_TO.value
+                if r.primaryCoding
+                and (
+                    r.primaryCoding.code.root == Relation.TRANSCRIBES_TO.value
+                    and r.primaryCoding.system == "http://www.sequenceontology.org"
+                )
             )
             != 1
         ):
-            err_msg = f"Must contain exactly one relation where `primaryCode` is '{Relation.TRANSCRIBES_TO.value}'."
+            err_msg = f"Must contain exactly one relation where `primaryCoding.code` is '{Relation.TRANSCRIBES_TO.value}' and `primaryCoding.system` is 'http://www.sequenceontology.org'."
             raise ValueError(err_msg)
 
         return v
@@ -142,7 +152,7 @@ class CategoricalCnv(CategoricalVariant):
 
         ``constraints`` must contain two constraints:
             1. ``DefiningLocationConstraint`` where the ``relations`` property contains
-                at least one relation where ``primaryCode = liftover_to``
+                at least one relation where ``primaryCoding.code = liftover_to`` and ``primaryCoding.system = ga4gh-gks-term:allele-relation``
             2. Either a ``CopyCountConstraint`` or ``CopyChangeCount``
 
         :param v: Constraints property to validate
@@ -161,9 +171,9 @@ class CategoricalCnv(CategoricalVariant):
                 def_loc_constr_found = True
 
                 for r in constraint.relations:
-                    if (
-                        r.primaryCode
-                        and r.primaryCode.root == Relation.LIFTOVER_TO.value
+                    if r.primaryCoding and (
+                        r.primaryCoding.code.root == Relation.LIFTOVER_TO.value
+                        and r.primaryCoding.system == "ga4gh-gks-term:allele-relation"
                     ):
                         def_loc_constr_valid = True
                         continue
@@ -174,11 +184,11 @@ class CategoricalCnv(CategoricalVariant):
                 )
 
         if not def_loc_constr_found:
-            err_msg = f"Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'."
+            err_msg = f"Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCoding.code` is '{Relation.LIFTOVER_TO.value}' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'."
             raise ValueError(err_msg)
 
         if not def_loc_constr_valid:
-            err_msg = f"`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCode` is '{Relation.LIFTOVER_TO.value}'"
+            err_msg = f"`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is '{Relation.LIFTOVER_TO.value}' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'."
             raise ValueError(err_msg)
 
         if not copy_constr_found:

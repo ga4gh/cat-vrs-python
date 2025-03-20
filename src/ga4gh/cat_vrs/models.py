@@ -14,8 +14,8 @@ from ga4gh.core.models import (
     MappableConcept,
     iriReference,
 )
-from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
-from pydantic import Field, RootModel, field_validator
+from ga4gh.vrs.models import Allele, Range, SequenceLocation, Variation
+from pydantic import Field, RootModel
 
 
 class Relation(str, Enum):
@@ -82,26 +82,19 @@ class CopyChangeConstraint(BaseModelForbidExtra):
     type: Literal["CopyChangeConstraint"] = Field(
         "CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
     )
-    copyChange: str = Field(
+    copyChange: MappableConcept = Field(
         ...,
         description="The relative assessment of the change in copies that members of this categorical variant satisfies.",
     )
 
-    @field_validator("copyChange")
-    @classmethod
-    def validate_copy_change(cls, v: str) -> str:
-        """Validate copyChange property
 
-        :param v: copyChange value
-        :raises ValueError: If ``copyChange.code`` is not a valid CopyChange
-        :return: copyChange property
-        """
-        try:
-            CopyChange(v)
-        except ValueError as e:
-            err_msg = f"copyChange, {v}, not one of {[cc.value for cc in CopyChange]}"
-            raise ValueError(err_msg) from e
-        return v
+class FeatureContextConstraint(BaseModelForbidExtra):
+    """The feature that members of this categorical variant are associated with."""
+
+    type: Literal["FeatureContextConstraint"] = Field(
+        "FeatureContextConstraint", description="MUST be 'FeatureContextConstraint'"
+    )
+    featureContext: MappableConcept = Field(..., description="A feature identifier.")
 
 
 class Constraint(RootModel):
@@ -112,6 +105,7 @@ class Constraint(RootModel):
         | DefiningLocationConstraint
         | CopyCountConstraint
         | CopyChangeConstraint
+        | FeatureContextConstraint
     ) = Field(..., discriminator="type")
 
 
