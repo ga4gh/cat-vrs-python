@@ -32,7 +32,7 @@ keywords = [
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-    "ga4gh.vrs==2.0.0a14",
+    "ga4gh.vrs @ git+https://github.com/ga4gh/vrs-python.git@main",
     "pydantic==2.*",
 ]
 

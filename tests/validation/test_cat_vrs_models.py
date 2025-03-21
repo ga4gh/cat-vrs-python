@@ -5,10 +5,10 @@ from copy import deepcopy
 import pytest
 from ga4gh.cat_vrs import models, recipes
 from ga4gh.core.models import (
+    Coding,
     MappableConcept,
     code,
 )
-from ga4gh.vrs.models import CopyChange
 
 DUMMY_ALLELE_IRI = "allele.json#/1"  # Valid IRI but does not reference anything
 
@@ -29,7 +29,7 @@ def def_allele_constr_empty_relations(
 @pytest.fixture(scope="module")
 def copy_change_constr():
     """Create test fixture for copy change constraint"""
-    return models.CopyChangeConstraint(copyChange=CopyChange.EFO_0030069.value)
+    return models.CopyChangeConstraint(copyChange="gain")
 
 
 @pytest.fixture(scope="module")
@@ -43,7 +43,12 @@ def defining_loc_constr():
     """Create test fixture for defining location constraint"""
     return models.DefiningLocationConstraint(
         relations=[
-            MappableConcept(primaryCode=code(models.Relation.LIFTOVER_TO.value))
+            MappableConcept(
+                primaryCoding=Coding(
+                    code=code(models.Relation.LIFTOVER_TO.value),
+                    system="ga4gh-gks-term:allele-relation",
+                )
+            )
         ],
         location="location.json#/1",
         matchCharacteristic=MappableConcept(name="test"),
@@ -66,10 +71,13 @@ def test_copy_count_constraint():
 def test_copy_change_constraint():
     """Test the CopyChangeConstraint validator"""
     # Valid Copy Change
-    assert models.CopyChangeConstraint(copyChange=CopyChange.EFO_0030069.value)
+    assert models.CopyChangeConstraint(copyChange="loss")
 
     # Invalid Copy Change
-    with pytest.raises(ValueError, match="copyChange, 0030069, not one of"):
+    with pytest.raises(
+        ValueError,
+        match="Input should be 'complete genomic loss', 'high-level loss', 'low-level loss', 'loss', 'regional base ploidy', 'gain', 'low-level gain' or 'high-level gain'",
+    ):
         models.CopyChangeConstraint(copyChange="0030069")
 
 
@@ -82,7 +90,10 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSLATES_FROM.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSLATION_OF.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     )
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -114,7 +125,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     with pytest.raises(ValueError, match=err_msg):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
-    # Invalid PSC: relations does not use primaryCode
+    # Invalid PSC: relations does not use primaryCoding
     invalid_params = deepcopy(members)
     invalid_params["constraints"] = [
         models.Constraint(
@@ -127,13 +138,18 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     with pytest.raises(ValueError, match=err_msg):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
-    # Invalid PSC: relations has 0 'translates_from'
+    # Invalid PSC: relations has 0 'translation_of'
     invalid_params = deepcopy(members)
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
-                    MappableConcept(primaryCode=code(models.Relation.LIFTOVER_TO.value))
+                    MappableConcept(
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
+                    )
                 ],
                 allele=DUMMY_ALLELE_IRI,
             )
@@ -142,17 +158,23 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     with pytest.raises(ValueError, match=err_msg):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
-    # Invalid PSC: relations has > 1 'translates_from'
+    # Invalid PSC: relations has > 1 'translation_of'
     invalid_params = deepcopy(members)
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSLATES_FROM.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSLATION_OF.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSLATES_FROM.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSLATION_OF.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -172,10 +194,16 @@ def test_canonical_allele(defining_loc_constr, members):
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.LIFTOVER_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="ga4gh-gks-term:allele-relation",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -215,10 +243,16 @@ def test_canonical_allele(defining_loc_constr, members):
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -227,7 +261,7 @@ def test_canonical_allele(defining_loc_constr, members):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCode` is 'liftover_to'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'liftover_to'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
@@ -238,13 +272,22 @@ def test_canonical_allele(defining_loc_constr, members):
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.LIFTOVER_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="ga4gh-gks-term:allele-relation",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.LIFTOVER_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="ga4gh-gks-term:allele-relation",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -253,21 +296,27 @@ def test_canonical_allele(defining_loc_constr, members):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCode` is 'liftover_to'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'liftover_to'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
-    # Invalid CanonicalAllele: No 'transcribes_to'
+    # Invalid CanonicalAllele: No 'transcribed_to'
     valid_params = deepcopy(members)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.LIFTOVER_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSLATES_FROM.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSLATION_OF.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -276,24 +325,33 @@ def test_canonical_allele(defining_loc_constr, members):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCode` is 'transcribes_to'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
-    # Invalid CanonicalAllele: > 1 'transcribes_to'
+    # Invalid CanonicalAllele: > 1 'transcribed_to'
     valid_params = deepcopy(members)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
                     MappableConcept(
-                        primaryCode=code(models.Relation.LIFTOVER_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.LIFTOVER_TO.value),
+                            system="ga4gh-gks-term:allele-relation",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                     MappableConcept(
-                        primaryCode=code(models.Relation.TRANSCRIBES_TO.value)
+                        primaryCoding=Coding(
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
+                            system="http://www.sequenceontology.org",
+                        )
                     ),
                 ],
                 allele=DUMMY_ALLELE_IRI,
@@ -302,7 +360,7 @@ def test_canonical_allele(defining_loc_constr, members):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCode` is 'transcribes_to'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'transcribed_to'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
@@ -333,7 +391,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCode` is 'liftover_to'.",
+        match="Must contain a `DefiningLocationConstraint` with at least one relation where `primaryCoding.code` is 'liftover_to'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
@@ -341,7 +399,12 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     invalid_params = deepcopy(members)
     invalid_defining_loc_constr = defining_loc_constr.copy(deep=True)
     invalid_defining_loc_constr.relations = [
-        MappableConcept(primaryCode=code(models.Relation.TRANSCRIBES_TO.value))
+        MappableConcept(
+            primaryCoding=Coding(
+                code=code(models.Relation.TRANSCRIBED_TO.value),
+                system="ga4gh-gks-term:allele-relation",
+            )
+        )
     ]
     invalid_params["constraints"] = [
         invalid_defining_loc_constr,
@@ -349,7 +412,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     ]
     with pytest.raises(
         ValueError,
-        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCode` is 'liftover_to'.",
+        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
