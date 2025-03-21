@@ -91,7 +91,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                 relations=[
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATES_FROM.value),
+                            code=code(models.Relation.TRANSLATION_OF.value),
                             system="http://www.sequenceontology.org",
                         )
                     )
@@ -138,7 +138,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     with pytest.raises(ValueError, match=err_msg):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
-    # Invalid PSC: relations has 0 'translates_from'
+    # Invalid PSC: relations has 0 'translation_of'
     invalid_params = deepcopy(members)
     invalid_params["constraints"] = [
         models.Constraint(
@@ -158,7 +158,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
     with pytest.raises(ValueError, match=err_msg):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
-    # Invalid PSC: relations has > 1 'translates_from'
+    # Invalid PSC: relations has > 1 'translation_of'
     invalid_params = deepcopy(members)
     invalid_params["constraints"] = [
         models.Constraint(
@@ -166,13 +166,13 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
                 relations=[
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATES_FROM.value),
+                            code=code(models.Relation.TRANSLATION_OF.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATES_FROM.value),
+                            code=code(models.Relation.TRANSLATION_OF.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -201,7 +201,7 @@ def test_canonical_allele(defining_loc_constr, members):
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -244,13 +244,13 @@ def test_canonical_allele(defining_loc_constr, members):
                 relations=[
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -285,7 +285,7 @@ def test_canonical_allele(defining_loc_constr, members):
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -300,7 +300,7 @@ def test_canonical_allele(defining_loc_constr, members):
     ):
         recipes.CanonicalAllele(**valid_params)
 
-    # Invalid CanonicalAllele: No 'transcribes_to'
+    # Invalid CanonicalAllele: No 'transcribed_to'
     valid_params = deepcopy(members)
     valid_params["constraints"] = [
         models.Constraint(
@@ -314,7 +314,7 @@ def test_canonical_allele(defining_loc_constr, members):
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATES_FROM.value),
+                            code=code(models.Relation.TRANSLATION_OF.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -329,7 +329,7 @@ def test_canonical_allele(defining_loc_constr, members):
     ):
         recipes.CanonicalAllele(**valid_params)
 
-    # Invalid CanonicalAllele: > 1 'transcribes_to'
+    # Invalid CanonicalAllele: > 1 'transcribed_to'
     valid_params = deepcopy(members)
     valid_params["constraints"] = [
         models.Constraint(
@@ -343,13 +343,13 @@ def test_canonical_allele(defining_loc_constr, members):
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
                     MappableConcept(
                         primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBES_TO.value),
+                            code=code(models.Relation.TRANSCRIBED_TO.value),
                             system="http://www.sequenceontology.org",
                         )
                     ),
@@ -360,7 +360,7 @@ def test_canonical_allele(defining_loc_constr, members):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCoding.code` is 'transcribes_to'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'transcribed_to'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
@@ -401,7 +401,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     invalid_defining_loc_constr.relations = [
         MappableConcept(
             primaryCoding=Coding(
-                code=code(models.Relation.TRANSCRIBES_TO.value),
+                code=code(models.Relation.TRANSCRIBED_TO.value),
                 system="ga4gh-gks-term:allele-relation",
             )
         )

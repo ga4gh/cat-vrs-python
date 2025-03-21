@@ -23,9 +23,9 @@ class Relation(str, Enum):
     context.
     """
 
-    TRANSLATES_FROM = "translates_from"
+    TRANSLATION_OF = "translation_of"
     LIFTOVER_TO = "liftover_to"
-    TRANSCRIBES_TO = "transcribes_to"
+    TRANSCRIBED_TO = "transcribed_to"
 
 
 class DefiningAlleleConstraint(BaseModelForbidExtra):
