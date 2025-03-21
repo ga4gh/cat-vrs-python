@@ -29,11 +29,7 @@ def def_allele_constr_empty_relations(
 @pytest.fixture(scope="module")
 def copy_change_constr():
     """Create test fixture for copy change constraint"""
-    return models.CopyChangeConstraint(
-        copyChange=MappableConcept(
-            primaryCoding=Coding(code=code("gain"), system="EFO")
-        )
-    )
+    return models.CopyChangeConstraint(copyChange="gain")
 
 
 @pytest.fixture(scope="module")
@@ -75,16 +71,12 @@ def test_copy_count_constraint():
 def test_copy_change_constraint():
     """Test the CopyChangeConstraint validator"""
     # Valid Copy Change
-    assert models.CopyChangeConstraint(
-        copyChange=MappableConcept(
-            primaryCoding=Coding(code=code("loss"), system="EFO")
-        )
-    )
+    assert models.CopyChangeConstraint(copyChange="loss")
 
     # Invalid Copy Change
     with pytest.raises(
         ValueError,
-        match="Input should be a valid dictionary or instance of MappableConcept",
+        match="Input should be 'complete genomic loss', 'high-level loss', 'low-level loss', 'loss', 'regional base ploidy', 'gain', 'low-level gain' or 'high-level gain'",
     ):
         models.CopyChangeConstraint(copyChange="0030069")
 

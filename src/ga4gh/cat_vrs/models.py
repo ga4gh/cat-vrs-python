@@ -14,7 +14,7 @@ from ga4gh.core.models import (
     MappableConcept,
     iriReference,
 )
-from ga4gh.vrs.models import Allele, Range, SequenceLocation, Variation
+from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
 from pydantic import Field, RootModel
 
 
@@ -82,7 +82,7 @@ class CopyChangeConstraint(BaseModelForbidExtra):
     type: Literal["CopyChangeConstraint"] = Field(
         "CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
     )
-    copyChange: MappableConcept = Field(
+    copyChange: CopyChange = Field(
         ...,
         description="The relative assessment of the change in copies that members of this categorical variant satisfies.",
     )
