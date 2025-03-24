@@ -45,6 +45,9 @@ tests = [
     "pytest",
     "pytest-cov",
 ]
+notebooks = [
+    "jupyter",
+]
 
 [project.urls]
 Homepage = "https://github.com/ga4gh/cat-vrs-python"
