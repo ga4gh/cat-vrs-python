@@ -32,7 +32,7 @@ class SystemUri(str, Enum):
     GKS_ALLELE_RELATION = "ga4gh-gks-term:allele-relation"
 
 
-class _CategoricalVariantValidatorMixin:
+class CategoricalVariantValidatorMixin:
     """Mixin class for reusable CategoricalVariant model validators
 
     Should be used with classes that inherit from Pydantic BaseModel
@@ -56,7 +56,7 @@ class _CategoricalVariantValidatorMixin:
         return model
 
 
-class ProteinSequenceConsequence(BaseModel, _CategoricalVariantValidatorMixin):
+class ProteinSequenceConsequence(BaseModel, CategoricalVariantValidatorMixin):
     """A change that occurs in a protein sequence as a result of genomic changes. Due to
     the degenerate nature of the genetic code, there are often several genomic changes
     that can cause a protein sequence consequence. The protein sequence consequence,
@@ -104,7 +104,7 @@ class ProteinSequenceConsequence(BaseModel, _CategoricalVariantValidatorMixin):
         return v
 
 
-class CanonicalAllele(BaseModel, _CategoricalVariantValidatorMixin):
+class CanonicalAllele(BaseModel, CategoricalVariantValidatorMixin):
     """A canonical allele is defined by an
     `Allele <https://vrs.ga4gh.org/en/2.x/concepts/MolecularVariation/Allele.html#>`_
     that is representative of a collection of congruent Alleles, each of which depict
@@ -175,7 +175,7 @@ class CanonicalAllele(BaseModel, _CategoricalVariantValidatorMixin):
         return v
 
 
-class CategoricalCnv(BaseModel, _CategoricalVariantValidatorMixin):
+class CategoricalCnv(BaseModel, CategoricalVariantValidatorMixin):
     """A representation of the constraints for matching knowledge about CNVs."""
 
     constraints: list[Constraint] = Field(
