@@ -38,6 +38,8 @@ class _CategoricalVariantValidatorMixin:
     Should be used with classes that inherit from Pydantic BaseModel
     """
 
+    model_config = ConfigDict(extra="allow")
+
     @model_validator(mode="after")
     def categorical_variant_validator(cls, model: BaseModel) -> BaseModel:  # noqa: N805
         """Validate that the model is a ``CategoricalVariant``.
@@ -63,8 +65,6 @@ class ProteinSequenceConsequence(BaseModel, _CategoricalVariantValidatorMixin):
     that is representative of a collection of congruent Protein Alleles that share the
     same altered codon(s).
     """
-
-    model_config = ConfigDict(extra="allow")
 
     constraints: list[Constraint] = Field(..., min_length=1)
 
@@ -112,8 +112,6 @@ class CanonicalAllele(BaseModel, _CategoricalVariantValidatorMixin):
     representations of an Allele often exist across different genome assemblies and
     associated cDNA transcript representations.
     """
-
-    model_config = ConfigDict(extra="allow")
 
     constraints: list[Constraint] = Field(..., min_length=1, max_length=1)
 
@@ -179,8 +177,6 @@ class CanonicalAllele(BaseModel, _CategoricalVariantValidatorMixin):
 
 class CategoricalCnv(BaseModel, _CategoricalVariantValidatorMixin):
     """A representation of the constraints for matching knowledge about CNVs."""
-
-    model_config = ConfigDict(extra="allow")
 
     constraints: list[Constraint] = Field(
         ...,
