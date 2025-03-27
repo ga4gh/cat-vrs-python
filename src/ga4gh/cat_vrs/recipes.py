@@ -15,7 +15,14 @@ from ga4gh.cat_vrs.models import (
     DefiningLocationConstraint,
     Relation,
 )
-from pydantic import Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 
 class SystemUri(str, Enum):
@@ -25,7 +32,31 @@ class SystemUri(str, Enum):
     GKS_ALLELE_RELATION = "ga4gh-gks-term:allele-relation"
 
 
-class ProteinSequenceConsequence(CategoricalVariant):
+class CategoricalVariantValidatorMixin:
+    """Mixin class for reusable CategoricalVariant model validators
+
+    Should be used with classes that inherit from Pydantic BaseModel
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    @model_validator(mode="after")
+    def categorical_variant_validator(cls, model: BaseModel) -> BaseModel:  # noqa: N805
+        """Validate that the model is a ``CategoricalVariant``.
+
+        :param model: Pydantic BaseModel to validate
+        :raises ValueError: If ``model`` does not validate against a ``CategoricalVariant``
+        :return: Validated model
+        """
+        try:
+            CategoricalVariant(**model.model_dump())
+        except ValidationError as e:
+            err_msg = "Must be a `CategoricalVariant`"
+            raise ValueError(err_msg) from e
+        return model
+
+
+class ProteinSequenceConsequence(BaseModel, CategoricalVariantValidatorMixin):
     """A change that occurs in a protein sequence as a result of genomic changes. Due to
     the degenerate nature of the genetic code, there are often several genomic changes
     that can cause a protein sequence consequence. The protein sequence consequence,
@@ -73,7 +104,7 @@ class ProteinSequenceConsequence(CategoricalVariant):
         return v
 
 
-class CanonicalAllele(CategoricalVariant):
+class CanonicalAllele(BaseModel, CategoricalVariantValidatorMixin):
     """A canonical allele is defined by an
     `Allele <https://vrs.ga4gh.org/en/2.x/concepts/MolecularVariation/Allele.html#>`_
     that is representative of a collection of congruent Alleles, each of which depict
@@ -144,7 +175,7 @@ class CanonicalAllele(CategoricalVariant):
         return v
 
 
-class CategoricalCnv(CategoricalVariant):
+class CategoricalCnv(BaseModel, CategoricalVariantValidatorMixin):
     """A representation of the constraints for matching knowledge about CNVs."""
 
     constraints: list[Constraint] = Field(
