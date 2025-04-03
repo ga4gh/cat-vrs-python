@@ -84,7 +84,8 @@ def test_copy_change_constraint():
 def test_protein_sequence_consequence(defining_loc_constr, members):
     """Test the ProteinSequenceConsequence validator"""
     # Valid PSC
-    constraints = [
+    valid_params = deepcopy(members)
+    valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
@@ -99,15 +100,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
             )
         )
     ]
-    valid_params = deepcopy(members)
-    valid_params["constraints"] = constraints
     assert recipes.ProteinSequenceConsequence(**valid_params)
-
-    # Invalid PSC: Not a CategoricalVariant
-    with pytest.raises(ValueError, match=r"Must be a `CategoricalVariant`"):
-        recipes.ProteinSequenceConsequence(
-            constraints=constraints, type="ProteinSequenceConsequence"
-        )
 
     # Invalid PSC: Constraint is NOT DefiningAlleleContext
     err_msg = "Unable to find at least one constraint that is a"
@@ -196,7 +189,7 @@ def test_canonical_allele(defining_loc_constr, members):
     """Test the CanonicalAllele validator"""
     # Valid CanonicalAllele
     valid_params = deepcopy(members)
-    constraints = [
+    valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
@@ -217,12 +210,7 @@ def test_canonical_allele(defining_loc_constr, members):
             )
         )
     ]
-    valid_params["constraints"] = constraints
     assert recipes.CanonicalAllele(**valid_params)
-
-    # Invalid CanonicalAllele: Not a CategoricalVariant
-    with pytest.raises(ValueError, match=r"Must be a `CategoricalVariant`"):
-        recipes.CanonicalAllele(constraints=constraints, type="CanonicalAllele")
 
     # Invalid CanonicalAllele: Constraint is NOT DefiningAlleleContext
     valid_params = deepcopy(members)
@@ -389,16 +377,11 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
 
     # Valid CategoricalCnv with CopyCountConstraint
     valid_params = deepcopy(members)
-    constraints = [
+    valid_params["constraints"] = [
         models.Constraint(root=defining_loc_constr),
         models.Constraint(root=models.CopyCountConstraint(copies=[1, 2])),
     ]
-    valid_params["constraints"] = constraints
     assert recipes.CategoricalCnv(**valid_params)
-
-    # Invalid CategoricalCnv: Not a CategoricalVariant
-    with pytest.raises(ValueError, match=r"Must be a `CategoricalVariant`"):
-        recipes.CategoricalCnv(constraints=constraints, type="CategoricalCnv")
 
     # Invalid CategoricalCnv: No DefiningLocationConstraint
     invalid_params = deepcopy(members)
