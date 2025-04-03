@@ -397,7 +397,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
 
     # Invalid CategoricalCnv: DefiningLocationConstraint does not have 'liftover_to'
     invalid_params = deepcopy(members)
-    invalid_defining_loc_constr = defining_loc_constr.copy(deep=True)
+    invalid_defining_loc_constr = defining_loc_constr.model_copy(deep=True)
     invalid_defining_loc_constr.relations = [
         MappableConcept(
             primaryCoding=Coding(
