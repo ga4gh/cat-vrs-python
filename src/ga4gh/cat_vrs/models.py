@@ -117,9 +117,10 @@ class CategoricalVariant(Entity, BaseModelForbidExtra):
     type: Literal["CategoricalVariant"] = Field(
         "CategoricalVariant", description="MUST be 'CategoricalVariant'"
     )
+    name: str = Field(..., description="A primary name for the entity.")
     members: list[Variation | iriReference] | None = Field(
         None,
-        description="A non-exhaustive list of VRS variation Constraints that satisfy the constraints of this categorical variant.",
+        description="A non-exhaustive list of VRS Variations that satisfy the constraints of this categorical variant.",
     )
     constraints: list[Constraint] | None = None
     mappings: list[ConceptMapping] | None = Field(

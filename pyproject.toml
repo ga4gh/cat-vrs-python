@@ -44,6 +44,7 @@ dev = [
 tests = [
     "pytest",
     "pytest-cov",
+    "pyyaml",
 ]
 notebooks = [
     "jupyter",
