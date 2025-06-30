@@ -33,9 +33,9 @@ def copy_change_constr():
 
 
 @pytest.fixture(scope="module")
-def members():
-    """Create test fixture for members"""
-    return {"members": ["variation.json#/1"]}
+def members_and_name():
+    """Create test fixture for members and name"""
+    return {"members": ["variation.json#/1"], "name": "dummy"}
 
 
 @pytest.fixture(scope="module")
@@ -81,10 +81,10 @@ def test_copy_change_constraint():
         models.CopyChangeConstraint(copyChange="0030069")
 
 
-def test_protein_sequence_consequence(defining_loc_constr, members):
+def test_protein_sequence_consequence(defining_loc_constr, members_and_name):
     """Test the ProteinSequenceConsequence validator"""
     # Valid PSC
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -104,13 +104,13 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
 
     # Invalid PSC: Constraint is NOT DefiningAlleleContext
     err_msg = "Unable to find at least one constraint that is a"
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [models.Constraint(root=defining_loc_constr)]
     with pytest.raises(ValueError, match=err_msg):
         assert recipes.ProteinSequenceConsequence(**invalid_params)
 
     # Invalid PSC: No relations defined
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=False))
     ]
@@ -118,7 +118,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
     # Invalid PSC: Empty list of relations
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=True))
     ]
@@ -126,7 +126,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
     # Invalid PSC: relations does not use primaryCoding
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -139,7 +139,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
     # Invalid PSC: relations has 0 'translation_of'
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -159,7 +159,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
     # Invalid PSC: relations has > 1 'translation_of'
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -185,10 +185,10 @@ def test_protein_sequence_consequence(defining_loc_constr, members):
         recipes.ProteinSequenceConsequence(**invalid_params)
 
 
-def test_canonical_allele(defining_loc_constr, members):
+def test_canonical_allele(defining_loc_constr, members_and_name):
     """Test the CanonicalAllele validator"""
     # Valid CanonicalAllele
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -213,7 +213,7 @@ def test_canonical_allele(defining_loc_constr, members):
     assert recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: Constraint is NOT DefiningAlleleContext
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [models.Constraint(root=defining_loc_constr)]
     with pytest.raises(
         ValueError, match="Constraint must be a `DefiningAlleleConstraint`."
@@ -221,7 +221,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: No relations defined
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=False))
     ]
@@ -229,7 +229,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: Empty list of relations
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=True))
     ]
@@ -237,7 +237,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: No 'liftover_to'
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -266,7 +266,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: > 1 'liftover_to'
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -301,7 +301,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: No 'transcribed_to'
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -330,7 +330,7 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
     # Invalid CanonicalAllele: > 1 'transcribed_to'
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
@@ -365,10 +365,10 @@ def test_canonical_allele(defining_loc_constr, members):
         recipes.CanonicalAllele(**valid_params)
 
 
-def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
+def test_categorical_cnv(members_and_name, defining_loc_constr, copy_change_constr):
     """Test the CategoricalCnv validator"""
     # Valid CategoricalCnv with CopyChangeConstraint
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(root=defining_loc_constr),
         models.Constraint(root=copy_change_constr),
@@ -376,7 +376,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     assert recipes.CategoricalCnv(**valid_params)
 
     # Valid CategoricalCnv with CopyCountConstraint
-    valid_params = deepcopy(members)
+    valid_params = deepcopy(members_and_name)
     valid_params["constraints"] = [
         models.Constraint(root=defining_loc_constr),
         models.Constraint(root=models.CopyCountConstraint(copies=[1, 2])),
@@ -384,7 +384,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
     assert recipes.CategoricalCnv(**valid_params)
 
     # Invalid CategoricalCnv: No DefiningLocationConstraint
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_params["constraints"] = [
         models.Constraint(root=def_allele_constr_empty_relations()),
         copy_change_constr,
@@ -396,7 +396,7 @@ def test_categorical_cnv(members, defining_loc_constr, copy_change_constr):
         recipes.CategoricalCnv(**invalid_params)
 
     # Invalid CategoricalCnv: DefiningLocationConstraint does not have 'liftover_to'
-    invalid_params = deepcopy(members)
+    invalid_params = deepcopy(members_and_name)
     invalid_defining_loc_constr = defining_loc_constr.model_copy(deep=True)
     invalid_defining_loc_constr.relations = [
         MappableConcept(
