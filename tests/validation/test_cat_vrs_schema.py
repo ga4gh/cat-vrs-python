@@ -23,7 +23,7 @@ class CatVrsSchemaMapping(BaseModel):
     base_classes: set = set()
     concrete_classes: set = set()
     primitives: set = set()
-    schema: dict = {}
+    cat_vrs_schema: dict = {}
 
 
 def _update_cat_vrs_schema_mapping(
@@ -38,7 +38,7 @@ def _update_cat_vrs_schema_mapping(
         cls_def = json.load(rf)
 
     spec_class = cls_def["title"]
-    cat_vrs_schema_mapping.schema[spec_class] = cls_def
+    cat_vrs_schema_mapping.cat_vrs_schema[spec_class] = cls_def
 
     if "properties" in cls_def:
         cat_vrs_schema_mapping.concrete_classes.add(spec_class)
@@ -96,11 +96,11 @@ def test_schema_class_fields(cat_vrs_schema, pydantic_models):
     """
     mapping = CAT_VRS_SCHEMA_MAPPING[cat_vrs_schema]
     for schema_model in mapping.concrete_classes:
-        schema_properties = mapping.schema[schema_model]["properties"]
+        schema_properties = mapping.cat_vrs_schema[schema_model]["properties"]
         pydantic_model = getattr(pydantic_models, schema_model)
         assert set(pydantic_model.model_fields) == set(schema_properties), schema_model
 
-        required_schema_fields = set(mapping.schema[schema_model]["required"])
+        required_schema_fields = set(mapping.cat_vrs_schema[schema_model]["required"])
 
         for prop, property_def in schema_properties.items():
             pydantic_model_field_info = pydantic_model.model_fields[prop]
