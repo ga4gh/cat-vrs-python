@@ -14,7 +14,7 @@
 ## Development
 
 [![action status](https://github.com/ga4gh/cat-vrs-python/actions/workflows/python-cqa.yaml/badge.svg)](https://github.com/ga4gh/cat-vrs-python/actions/workflows/python-cqa.yaml) [![issues](https://img.shields.io/github/issues-raw/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/issues)
-[![GitHub Open Pull Requests](https://img.shields.io/github/issues-pr/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/pull/) [![GitHub license](https://img.shields.io/github/contributors/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/graphs/contributors/) [![GitHub stars](https://img.shields.io/github/stars/ga4gh/cat-vrs-python.svg?style=social&label=Stars)](https://github.com/ga4gh/cat-vrs-python/stargazers) [![GitHub forks](https://img.shields.io/github/forks/ga4gh/cat-vrs-python.svg?style=social&label=Forks)](https://github.com/ga4gh/cat-vrs-python/network)
+[![GitHub Open Pull Requests](https://img.shields.io/github/issues-pr/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/pull/) [![GitHub license](https://img.shields.io/github/contributors/ga4gh/cat-vrs-python.svg)](https://github.com/ga4gh/cat-vrs-python/graphs/contributors/) [![GitHub stars](https://img.shields.io/github/stars/ga4gh/cat-vrs-python.svg?style=social&label=Stars)](https://github.com/ga4gh/cat-vrs-python/stargazers) [![GitHub forks](https://img.shields.io/github/forks/ga4gh/cat-vrs-python.svg?style=social&label=Forks)](https://github.com/ga4gh/cat-vrs-python/forks)
 
 ## Features
 
