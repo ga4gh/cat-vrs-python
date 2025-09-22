@@ -6,6 +6,8 @@ the GA4GH website for more information.
 
 from enum import Enum
 
+from pydantic import Field, field_validator
+
 from ga4gh.cat_vrs.models import (
     CategoricalVariant,
     Constraint,
@@ -15,7 +17,6 @@ from ga4gh.cat_vrs.models import (
     DefiningLocationConstraint,
     Relation,
 )
-from pydantic import Field, field_validator
 
 
 class SystemUri(str, Enum):

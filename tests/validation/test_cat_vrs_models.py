@@ -3,6 +3,7 @@
 from copy import deepcopy
 
 import pytest
+
 from ga4gh.cat_vrs import models, recipes
 from ga4gh.core.models import (
     Coding,

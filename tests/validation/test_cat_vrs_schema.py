@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 import yaml
-from ga4gh.cat_vrs import models, recipes
 from pydantic import BaseModel
+
+from ga4gh.cat_vrs import models, recipes
 
 
 class CatVrsSchema(str, Enum):

@@ -7,6 +7,8 @@ the GA4GH website for more information.
 from enum import Enum
 from typing import Literal
 
+from pydantic import Field, RootModel
+
 from ga4gh.core.models import (
     BaseModelForbidExtra,
     ConceptMapping,
@@ -15,7 +17,6 @@ from ga4gh.core.models import (
     iriReference,
 )
 from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
-from pydantic import Field, RootModel
 
 
 class Relation(str, Enum):
