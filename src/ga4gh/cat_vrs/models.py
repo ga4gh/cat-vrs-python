@@ -35,11 +35,12 @@ class DefiningAlleleConstraint(BaseModelForbidExtra):
     """
 
     type: Literal["DefiningAlleleConstraint"] = Field(
-        "DefiningAlleleConstraint", description="MUST be 'DefiningAlleleConstraint'"
+        default="DefiningAlleleConstraint",
+        description="MUST be 'DefiningAlleleConstraint'",
     )
     allele: Allele | iriReference
     relations: list[MappableConcept] | None = Field(
-        None,
+        default=None,
         description="Defined relationships from which members relate to the defining allele.",
     )
 
@@ -50,11 +51,12 @@ class DefiningLocationConstraint(BaseModelForbidExtra):
     """
 
     type: Literal["DefiningLocationConstraint"] = Field(
-        "DefiningLocationConstraint", description="MUST be 'DefiningLocationConstraint'"
+        default="DefiningLocationConstraint",
+        description="MUST be 'DefiningLocationConstraint'",
     )
     location: SequenceLocation | iriReference
     relations: list[MappableConcept] | None = Field(
-        None,
+        default=None,
         description="Defined relationships from which members relate to the defining location.",
     )
     matchCharacteristic: MappableConcept = Field(
@@ -69,7 +71,7 @@ class CopyCountConstraint(BaseModelForbidExtra):
     """
 
     type: Literal["CopyCountConstraint"] = Field(
-        "CopyCountConstraint", description="MUST be 'CopyCountConstraint'"
+        default="CopyCountConstraint", description="MUST be 'CopyCountConstraint'"
     )
     copies: int | Range = Field(
         ...,
@@ -81,7 +83,7 @@ class CopyChangeConstraint(BaseModelForbidExtra):
     """A representation of copy number change"""
 
     type: Literal["CopyChangeConstraint"] = Field(
-        "CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
+        default="CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
     )
     copyChange: CopyChange = Field(
         ...,
@@ -93,7 +95,8 @@ class FeatureContextConstraint(BaseModelForbidExtra):
     """The feature that members of this categorical variant are associated with."""
 
     type: Literal["FeatureContextConstraint"] = Field(
-        "FeatureContextConstraint", description="MUST be 'FeatureContextConstraint'"
+        default="FeatureContextConstraint",
+        description="MUST be 'FeatureContextConstraint'",
     )
     featureContext: MappableConcept = Field(..., description="A feature identifier.")
 
@@ -116,15 +119,15 @@ class CategoricalVariant(Entity, BaseModelForbidExtra):
     """
 
     type: Literal["CategoricalVariant"] = Field(
-        "CategoricalVariant", description="MUST be 'CategoricalVariant'"
+        default="CategoricalVariant", description="MUST be 'CategoricalVariant'"
     )
     name: str = Field(..., description="A primary name for the entity.")
     members: list[Variation | iriReference] | None = Field(
-        None,
+        default=None,
         description="A non-exhaustive list of VRS Variations that satisfy the constraints of this categorical variant.",
     )
     constraints: list[Constraint] | None = None
     mappings: list[ConceptMapping] | None = Field(
-        None,
+        default=None,
         description="A list of mappings to concepts in terminologies or code systems. Each mapping should include a coding and a relation.",
     )
