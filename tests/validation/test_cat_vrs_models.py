@@ -1,5 +1,6 @@
 """Test Cat VRS Pydantic models"""
 
+import re
 from copy import deepcopy
 
 import pytest
@@ -366,7 +367,11 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
         recipes.CanonicalAllele(**valid_params)
 
 
-def test_categorical_cnv(members_and_name, defining_loc_constr, copy_change_constr):
+def test_categorical_cnv(
+    members_and_name: dict,
+    defining_loc_constr: models.DefiningLocationConstraint,
+    copy_change_constr: models.CopyChangeConstraint,
+):
     """Test the CategoricalCnv validator"""
     # Valid CategoricalCnv with CopyChangeConstraint
     valid_params = deepcopy(members_and_name)
@@ -383,6 +388,22 @@ def test_categorical_cnv(members_and_name, defining_loc_constr, copy_change_cons
         models.Constraint(root=models.CopyCountConstraint(copies=[1, 2])),
     ]
     assert recipes.CategoricalCnv(**valid_params)
+
+    # Invalid CategoricalCnv: relations unset on DLC
+    invalid_params = deepcopy(members_and_name)
+    invalid_dlc = deepcopy(defining_loc_constr)
+    invalid_dlc.relations = None
+    invalid_params["constraints"] = [
+        models.Constraint(root=invalid_dlc),
+        models.Constraint(root=models.CopyCountConstraint(copies=[1, 2])),
+    ]
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "1 validation error for CategoricalCnv\nconstraints\n  Value error, `DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'. [type=value_error, input_value=[Constraint(root=Defining...es=Range(root=[1, 2])))], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+        ),
+    ):
+        recipes.CategoricalCnv(**invalid_params)
 
     # Invalid CategoricalCnv: No DefiningLocationConstraint
     invalid_params = deepcopy(members_and_name)
