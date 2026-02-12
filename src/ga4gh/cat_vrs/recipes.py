@@ -180,7 +180,8 @@ class CategoricalCnv(CategoricalVariant):
             ):
                 def_loc_constr_found = True
 
-                for r in constraint.relations:
+                relations = constraint.relations or []
+                for r in relations:
                     if r.primaryCoding and (
                         r.primaryCoding.code.root == Relation.LIFTOVER_TO.value
                         and r.primaryCoding.system
