@@ -1,6 +1,5 @@
 """Test Cat VRS Pydantic models"""
 
-import re
 from copy import deepcopy
 
 import pytest
@@ -399,9 +398,7 @@ def test_categorical_cnv(
     ]
     with pytest.raises(
         ValueError,
-        match=re.escape(
-            "1 validation error for CategoricalCnv\nconstraints\n  Value error, `DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'. [type=value_error, input_value=[Constraint(root=Defining...es=Range(root=[1, 2])))], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
-        ),
+        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
