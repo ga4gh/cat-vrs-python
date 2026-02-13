@@ -15,6 +15,8 @@ from ga4gh.cat_vrs.models import (
     CopyCountConstraint,
     DefiningAlleleConstraint,
     DefiningLocationConstraint,
+    FeatureContextConstraint,
+    FunctionConstraint,
     Relation,
 )
 
@@ -78,7 +80,7 @@ class CanonicalAllele(CategoricalVariant):
     """A canonical allele is defined by an
     `Allele <https://vrs.ga4gh.org/en/2.x/concepts/MolecularVariation/Allele.html#>`_
     that is representative of a collection of congruent Alleles, each of which depict
-    the same nucleic acid change on different underlying reference sequences. Congruent
+    the same nucleic acid on different underlying reference sequences. Congruent
     representations of an Allele often exist across different genome assemblies and
     associated cDNA transcript representations.
     """
@@ -208,5 +210,62 @@ class CategoricalCnv(CategoricalVariant):
                 "Must contain either a `CopyCountConstraint` or `CopyChangeConstraint`."
             )
             raise ValueError(err_msg)
+
+        return v
+
+
+class FunctionVariant(CategoricalVariant):
+    """A representation of the constraints for matching knowledge about function
+    variants; e.g., gain-of-function or loss-of-function.
+    """
+
+    constraints: list[Constraint] = Field(
+        ...,
+        min_length=2,
+        description=(
+            "The constraints must contain at least two items: a FunctionConstraint and either a DefiningAlleleConstraint, DefiningLocationConstraint, or FeatureContextConstraint."
+        ),
+    )
+
+    @field_validator("constraints")
+    @classmethod
+    def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
+        """Validate constraints property
+
+        ``constraints`` must:
+            1. Contain at least one ``FunctionConstraint``
+            2. Contain at least one of:
+                - ``DefiningAlleleConstraint``
+                - ``DefiningLocationConstraint``
+                - ``FeatureContextConstraint``
+
+        :param v: Constraints property to validate
+        :raises ValueError: If constraints property does not satisfy requirements
+        :return: Constraints property
+        """
+        has_function_constraint = False
+        has_context_constraint = False
+
+        for constraint in v:
+            root = constraint.root
+
+            if isinstance(root, FunctionConstraint):
+                has_function_constraint = True
+
+            if isinstance(
+                root,
+                DefiningAlleleConstraint
+                | DefiningLocationConstraint
+                | FeatureContextConstraint,
+            ):
+                has_context_constraint = True
+
+        if not has_function_constraint:
+            msg = "Must contain at least one `FunctionConstraint`."
+            raise ValueError(msg)
+
+        if not has_context_constraint:
+            msg = "Must contain at least one of: `DefiningAlleleConstraint`, `DefiningLocationConstraint`, or `FeatureContextConstraint`."
+            raise ValueError(msg)
 
         return v

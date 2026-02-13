@@ -56,6 +56,33 @@ def defining_loc_constr():
     )
 
 
+@pytest.fixture(scope="module")
+def feature_context_constr():
+    """Create test fixture for feature context constraint"""
+    return models.FeatureContextConstraint(
+        featureContext=MappableConcept(
+            primaryCoding=Coding(
+                code=code("HGNC:1097"),
+                system="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/",
+            )
+        )
+    )
+
+
+@pytest.fixture(scope="module")
+def function_constr():
+    """Create test fixture for function constraint"""
+    return models.FunctionConstraint(
+        functionConsequence=MappableConcept(
+            primaryCoding=Coding(
+                code=code("SO:0002219"),
+                system="http://www.sequenceontology.org/browser/current_release/term/",
+            )
+        ),
+        description="Function consequence described as functionally normal using Sequence Ontology.",
+    )
+
+
 def test_copy_count_constraint():
     """Test the CopyCountConstraint validator"""
     # Valid Copy Count Constraint
@@ -445,3 +472,67 @@ def test_categorical_cnv(
         match="Must contain either a `CopyCountConstraint` or `CopyChangeConstraint`.",
     ):
         recipes.CategoricalCnv(**invalid_params)
+
+
+def test_function_variant(
+    members_and_name: dict,
+    function_constr: models.FunctionConstraint,
+    defining_loc_constr: models.DefiningLocationConstraint,
+    feature_context_constr: models.FeatureContextConstraint,
+):
+    """Test the FunctionVariant validator"""
+    # Valid FunctionVariant with DefiningAlleleConstraint
+    valid_params = deepcopy(members_and_name)
+    valid_params["constraints"] = [
+        models.Constraint(root=function_constr),
+        models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=True)),
+    ]
+    assert recipes.FunctionVariant(**valid_params)
+
+    # Valid FunctionVariant with DefiningLocationConstraint
+    valid_params = deepcopy(members_and_name)
+    valid_params["constraints"] = [
+        models.Constraint(root=function_constr),
+        models.Constraint(root=defining_loc_constr),
+    ]
+    assert recipes.FunctionVariant(**valid_params)
+
+    # Valid FunctionVariant with FeatureContextConstraint
+    valid_params = deepcopy(members_and_name)
+    valid_params["constraints"] = [
+        models.Constraint(root=function_constr),
+        models.Constraint(root=feature_context_constr),
+    ]
+    assert recipes.FunctionVariant(**valid_params)
+
+    # Invalid FunctionVariant: No FunctionConstraint
+    invalid_params = deepcopy(members_and_name)
+    invalid_params["constraints"] = [
+        models.Constraint(root=def_allele_constr_empty_relations(is_empty_list=True)),
+        models.Constraint(root=defining_loc_constr),
+    ]
+    with pytest.raises(
+        ValueError,
+        match="Must contain at least one `FunctionConstraint`.",
+    ):
+        recipes.FunctionVariant(**invalid_params)
+
+    # Invalid FunctionVariant: No contextual constraint
+    invalid_params = deepcopy(members_and_name)
+    invalid_params["constraints"] = [
+        models.Constraint(root=function_constr),
+        models.Constraint(root=function_constr.model_copy(deep=True)),
+    ]
+    with pytest.raises(
+        ValueError,
+        match="Must contain at least one of:",
+    ):
+        recipes.FunctionVariant(**invalid_params)
+
+    # Invalid FunctionVariant: Only one constraint provided
+    invalid_params = deepcopy(members_and_name)
+    invalid_params["constraints"] = [
+        models.Constraint(root=function_constr),
+    ]
+    with pytest.raises(ValueError, match="List should have at least 2 items"):
+        recipes.FunctionVariant(**invalid_params)
