@@ -80,7 +80,9 @@ class CopyCountConstraint(BaseModelForbidExtra):
 
 
 class CopyChangeConstraint(BaseModelForbidExtra):
-    """A representation of copy number change"""
+    """The relative assessment of the change in copies that members of this categorical
+    variant satisfy.
+    """
 
     type: Literal["CopyChangeConstraint"] = Field(
         default="CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
@@ -101,6 +103,22 @@ class FeatureContextConstraint(BaseModelForbidExtra):
     featureContext: MappableConcept = Field(..., description="A feature identifier.")
 
 
+class FunctionConstraint(BaseModelForbidExtra):
+    """A classification of the protein functional consequence that characterizes members of this categorical variant."""
+
+    type: Literal["FunctionConstraint"] = Field(
+        default="FunctionConstraint",
+        description='MUST be "FunctionConstraint"',
+    )
+    functionConsequence: MappableConcept = Field(
+        ...,
+        description="The functional consequence of members of this categorical variant, as defined by an external ontology. We recommend using one of the defined terms from [The Sequence Ontology](http://www.sequenceontology.org). See Implementation Guidance for more details. ",
+    )
+    description: str | None = Field(
+        default=None, description="A free-text description of the function change."
+    )
+
+
 class Constraint(RootModel):
     """Constraints are used to construct an intensional semantics of categorical variant types."""
 
@@ -110,6 +128,7 @@ class Constraint(RootModel):
         | CopyCountConstraint
         | CopyChangeConstraint
         | FeatureContextConstraint
+        | FunctionConstraint
     ) = Field(..., discriminator="type")
 
 
