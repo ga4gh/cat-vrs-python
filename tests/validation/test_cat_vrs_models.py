@@ -5,6 +5,11 @@ from copy import deepcopy
 import pytest
 
 from ga4gh.cat_vrs import models, recipes
+from ga4gh.cat_vrs.relations import (
+    LIFTOVER_TO_RELATION,
+    TRANSCRIBED_TO_RELATION,
+    TRANSLATION_OF_RELATION,
+)
 from ga4gh.core.models import (
     Coding,
     MappableConcept,
@@ -43,14 +48,7 @@ def members_and_name():
 def defining_loc_constr():
     """Create test fixture for defining location constraint"""
     return models.DefiningLocationConstraint(
-        relations=[
-            MappableConcept(
-                primaryCoding=Coding(
-                    code=code(models.Relation.LIFTOVER_TO.value),
-                    system="ga4gh-gks-term:allele-relation",
-                )
-            )
-        ],
+        relations=[LIFTOVER_TO_RELATION],
         location="location.json#/1",
         matchCharacteristic=MappableConcept(name="test"),
     )
@@ -89,14 +87,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members_and_name):
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATION_OF.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    )
-                ],
+                relations=[TRANSLATION_OF_RELATION],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -131,7 +122,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members_and_name):
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[MappableConcept(name=models.Relation.LIFTOVER_TO.value)],
+                relations=[MappableConcept(name="liftover_to")],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -144,14 +135,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members_and_name):
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    )
-                ],
+                relations=[LIFTOVER_TO_RELATION],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -164,20 +148,7 @@ def test_protein_sequence_consequence(defining_loc_constr, members_and_name):
     invalid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATION_OF.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATION_OF.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                ],
+                relations=[TRANSLATION_OF_RELATION, TRANSLATION_OF_RELATION],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -193,20 +164,7 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="ga4gh-gks-term:allele-relation",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                ],
+                relations=[LIFTOVER_TO_RELATION, TRANSCRIBED_TO_RELATION],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -242,20 +200,7 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
     valid_params["constraints"] = [
         models.Constraint(
             root=models.DefiningAlleleConstraint(
-                relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                ],
+                relations=[TRANSCRIBED_TO_RELATION, TRANSCRIBED_TO_RELATION],
                 allele=DUMMY_ALLELE_IRI,
             )
         )
@@ -272,24 +217,9 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="ga4gh-gks-term:allele-relation",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="ga4gh-gks-term:allele-relation",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
+                    LIFTOVER_TO_RELATION,
+                    LIFTOVER_TO_RELATION,
+                    TRANSCRIBED_TO_RELATION,
                 ],
                 allele=DUMMY_ALLELE_IRI,
             )
@@ -307,18 +237,8 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSLATION_OF.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
+                    LIFTOVER_TO_RELATION,
+                    TRANSLATION_OF_RELATION,
                 ],
                 allele=DUMMY_ALLELE_IRI,
             )
@@ -326,7 +246,7 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
     ]
     with pytest.raises(
         ValueError,
-        match="Must contain exactly one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
+        match="Must contain exactly one relation where `primaryCoding.code` is 'transcribed_to' and `primaryCoding.system` is 'http://www.sequenceontology.org'.",
     ):
         recipes.CanonicalAllele(**valid_params)
 
@@ -336,24 +256,9 @@ def test_canonical_allele(defining_loc_constr, members_and_name):
         models.Constraint(
             root=models.DefiningAlleleConstraint(
                 relations=[
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.LIFTOVER_TO.value),
-                            system="ga4gh-gks-term:allele-relation",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
-                    MappableConcept(
-                        primaryCoding=Coding(
-                            code=code(models.Relation.TRANSCRIBED_TO.value),
-                            system="http://www.sequenceontology.org",
-                        )
-                    ),
+                    LIFTOVER_TO_RELATION,
+                    TRANSCRIBED_TO_RELATION,
+                    TRANSCRIBED_TO_RELATION,
                 ],
                 allele=DUMMY_ALLELE_IRI,
             )
@@ -420,7 +325,7 @@ def test_categorical_cnv(
     invalid_defining_loc_constr.relations = [
         MappableConcept(
             primaryCoding=Coding(
-                code=code(models.Relation.TRANSCRIBED_TO.value),
+                code=code("transcribed_to"),
                 system="ga4gh-gks-term:allele-relation",
             )
         )

@@ -4,7 +4,6 @@ See the `CatVar page <https://www.ga4gh.org/product/categorical-variation-catvar
 the GA4GH website for more information.
 """
 
-from enum import Enum
 from typing import Literal
 
 from pydantic import Field, RootModel
@@ -17,16 +16,6 @@ from ga4gh.core.models import (
     iriReference,
 )
 from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
-
-
-class Relation(str, Enum):
-    """Defined relationships between members of the categorical variant and the defining
-    context.
-    """
-
-    TRANSLATION_OF = "translation_of"
-    LIFTOVER_TO = "liftover_to"
-    TRANSCRIBED_TO = "transcribed_to"
 
 
 class DefiningAlleleConstraint(BaseModelForbidExtra):
