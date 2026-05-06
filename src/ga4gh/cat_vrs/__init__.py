@@ -12,7 +12,7 @@ finally:
     del version, PackageNotFoundError
 
 
-CATVRS_VERSION = "1.0.0"
+CATVRS_VERSION = "1.1.0-snapshot.2026-02.3"
 
 __all__ = [
     "CATVRS_VERSION",
