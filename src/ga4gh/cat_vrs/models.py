@@ -4,10 +4,12 @@ See the `CatVar page <https://www.ga4gh.org/product/categorical-variation-catvar
 the GA4GH website for more information.
 """
 
-from typing import Literal
+from typing import ClassVar, Literal
 
 from pydantic import Field, RootModel
 
+from ga4gh.cat_vrs.metadata import CatVRSMetadataMixin
+from ga4gh.core.metadata import Maturity
 from ga4gh.core.models import (
     BaseModelForbidExtra,
     ConceptMapping,
@@ -18,10 +20,12 @@ from ga4gh.core.models import (
 from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
 
 
-class DefiningAlleleConstraint(BaseModelForbidExtra):
+class DefiningAlleleConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """The defining allele and its associated relationships that are congruent with
     member variants.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     type: Literal["DefiningAlleleConstraint"] = Field(
         default="DefiningAlleleConstraint",
@@ -34,10 +38,12 @@ class DefiningAlleleConstraint(BaseModelForbidExtra):
     )
 
 
-class DefiningLocationConstraint(BaseModelForbidExtra):
+class DefiningLocationConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """The defining location and its associated relationships that are congruent with
     member locations.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     type: Literal["DefiningLocationConstraint"] = Field(
         default="DefiningLocationConstraint",
@@ -54,10 +60,12 @@ class DefiningLocationConstraint(BaseModelForbidExtra):
     )
 
 
-class CopyCountConstraint(BaseModelForbidExtra):
+class CopyCountConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """The exact or range of copies that members of this categorical variant must
     satisfy.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     type: Literal["CopyCountConstraint"] = Field(
         default="CopyCountConstraint", description="MUST be 'CopyCountConstraint'"
@@ -68,10 +76,12 @@ class CopyCountConstraint(BaseModelForbidExtra):
     )
 
 
-class CopyChangeConstraint(BaseModelForbidExtra):
+class CopyChangeConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """The relative assessment of the change in copies that members of this categorical
     variant satisfy.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
 
     type: Literal["CopyChangeConstraint"] = Field(
         default="CopyChangeConstraint", description="MUST be 'CopyChangeConstraint'"
@@ -82,8 +92,10 @@ class CopyChangeConstraint(BaseModelForbidExtra):
     )
 
 
-class FeatureContextConstraint(BaseModelForbidExtra):
+class FeatureContextConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """The feature that members of this categorical variant are associated with."""
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
 
     type: Literal["FeatureContextConstraint"] = Field(
         default="FeatureContextConstraint",
@@ -92,8 +104,10 @@ class FeatureContextConstraint(BaseModelForbidExtra):
     featureContext: MappableConcept = Field(..., description="A feature identifier.")
 
 
-class FunctionConstraint(BaseModelForbidExtra):
+class FunctionConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     """A classification of the protein functional consequence that characterizes members of this categorical variant."""
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
 
     type: Literal["FunctionConstraint"] = Field(
         default="FunctionConstraint",
@@ -108,8 +122,10 @@ class FunctionConstraint(BaseModelForbidExtra):
     )
 
 
-class Constraint(RootModel):
+class Constraint(CatVRSMetadataMixin, RootModel):
     """Constraints are used to construct an intensional semantics of categorical variant types."""
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     root: (
         DefiningAlleleConstraint
@@ -121,10 +137,12 @@ class Constraint(RootModel):
     ) = Field(..., discriminator="type")
 
 
-class CategoricalVariant(Entity, BaseModelForbidExtra):
+class CategoricalVariant(CatVRSMetadataMixin, Entity, BaseModelForbidExtra):
     """A representation of a categorically-defined domain for variation, in which
     individual Constraintual variation instances may be members of the domain.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     type: Literal["CategoricalVariant"] = Field(
         default="CategoricalVariant", description="MUST be 'CategoricalVariant'"

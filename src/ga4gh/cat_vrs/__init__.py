@@ -1,21 +1,23 @@
 """Package for Cat-VRS Python implementation"""
 
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as package_version
 
 from . import models, recipes
+from .metadata import CatVRSMetadataMixin
+from .version import CATVRS_VERSION
 
 try:
-    __version__ = version(__name__)
+    __version__ = package_version(__name__)
 except PackageNotFoundError:  # pragma: nocover
     __version__ = "unknown"
 finally:
-    del version, PackageNotFoundError
+    del package_version, PackageNotFoundError
 
-
-CATVRS_VERSION = "1.1.0-snapshot.2026-02.3"
 
 __all__ = [
     "CATVRS_VERSION",
+    "CatVRSMetadataMixin",
     "__version__",
     "models",
     "recipes",
