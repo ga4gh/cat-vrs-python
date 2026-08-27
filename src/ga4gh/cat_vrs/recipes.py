@@ -4,6 +4,8 @@ See the `CatVar page <https://www.ga4gh.org/product/categorical-variation-catvar
 the GA4GH website for more information.
 """
 
+from typing import ClassVar
+
 from pydantic import Field, field_validator
 
 from ga4gh.cat_vrs.models import (
@@ -21,6 +23,7 @@ from ga4gh.cat_vrs.relations import (
     TRANSCRIBED_TO_RELATION,
     TRANSLATION_OF_RELATION,
 )
+from ga4gh.core.metadata import Maturity
 from ga4gh.core.models import MappableConcept
 
 
@@ -33,6 +36,8 @@ class ProteinSequenceConsequence(CategoricalVariant):
     that is representative of a collection of congruent Protein Alleles that share the
     same altered codon(s).
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
 
     constraints: list[Constraint] = Field(..., min_length=1)
 
@@ -81,6 +86,8 @@ class CanonicalAllele(CategoricalVariant):
     associated cDNA transcript representations.
     """
 
+    _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
+
     constraints: list[Constraint] = Field(..., min_length=1, max_length=1)
 
     @classmethod
@@ -125,6 +132,8 @@ class CanonicalAllele(CategoricalVariant):
 
 class CategoricalCnv(CategoricalVariant):
     """A representation of the constraints for matching knowledge about CNVs."""
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
 
     constraints: list[Constraint] = Field(
         ...,
@@ -184,6 +193,8 @@ class FunctionVariant(CategoricalVariant):
     """A representation of the constraints for matching knowledge about function
     variants; e.g., gain-of-function or loss-of-function.
     """
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
 
     constraints: list[Constraint] = Field(
         ...,
