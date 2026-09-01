@@ -4,9 +4,10 @@ See the `CatVar page <https://www.ga4gh.org/product/categorical-variation-catvar
 the GA4GH website for more information.
 """
 
+from enum import Enum
 from typing import ClassVar, Literal
 
-from pydantic import Field, RootModel
+from pydantic import ConfigDict, Field, RootModel
 
 from ga4gh.cat_vrs.metadata import CatVRSMetadataMixin
 from ga4gh.core.metadata import Maturity
@@ -17,7 +18,16 @@ from ga4gh.core.models import (
     MappableConcept,
     iriReference,
 )
-from ga4gh.vrs.models import Allele, CopyChange, Range, SequenceLocation, Variation
+from ga4gh.vrs.models import (
+    Allele,
+    CopyChange,
+    Location,
+    Range,
+    SequenceExpression,
+    SequenceLocation,
+    Terminus,
+    Variation,
+)
 
 
 class DefiningAlleleConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
@@ -57,6 +67,66 @@ class DefiningLocationConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
     matchCharacteristic: MappableConcept = Field(
         ...,
         description="A characteristic of the location that is used to match the defining location to member locations.",
+    )
+
+
+class FunctionalDomainStatus(str, Enum):
+    """Define whether a functional domain is preserved or lost."""
+
+    LOST = "lost"
+    PRESERVED = "preserved"
+
+
+class FunctionalDomain(CatVRSMetadataMixin, Entity, BaseModelForbidExtra):
+    """A sequence location whose presence or absence is used to define an adjacency."""
+
+    model_config = ConfigDict(use_enum_values=True)
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
+
+    type: Literal["FunctionalDomain"] = Field(
+        default="FunctionalDomain", description='Must be "FunctionalDomain"'
+    )
+    location: Location = Field(..., description="A Sequence Location for the domain.")
+    status: FunctionalDomainStatus = Field(
+        ..., description='MUST be either "preserved" or "lost"'
+    )
+
+
+class UnspecifiedElement(CatVRSMetadataMixin, Entity, BaseModelForbidExtra):
+    """Represents an unspecified element that satisfies the described adjacency."""
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
+
+    type: Literal["UnspecifiedElement"] = Field(
+        default="UnspecifiedElement", description='Must be "UnspecifiedElement"'
+    )
+
+
+class AdjacencyConstraint(CatVRSMetadataMixin, BaseModelForbidExtra):
+    """Components that define a molecular adjacency of congruent elements."""
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
+
+    type: Literal["AdjacencyConstraint"] = Field(
+        default="AdjacencyConstraint",
+        description="MUST be 'AdjacencyConstraint'",
+    )
+    adjoinedElements: list[
+        UnspecifiedElement | MappableConcept | iriReference | Location | Terminus
+    ] = Field(
+        ..., min_length=2, max_length=2, description="The elements of the adjacency."
+    )
+    functionalDomains: list[FunctionalDomain] | None = Field(
+        default=None,
+        description="Functional domains whose presence or absence is required to satisfy the adjacency.",
+    )
+    linker: SequenceExpression | None = Field(
+        default=None, description="The sequence found between the adjoined elements."
+    )
+    orderKnown: bool = Field(
+        ...,
+        description="When orderKnown is true, the order of adjoinedElements is assumed to denote the 5' partner first and the 3' partner second. If orderKnown is false, then the order of adjoinedElements assumed not in fact to be known, as in the case of a fusion where only one or both partners are known, but not their relative order. This field is redundant and may be set to true when using Sequence Locations and following the VRS 2 Adjacency model, as the order is implied by the usage of start and end on respective adjoinedElements.",
     )
 
 
@@ -130,9 +200,10 @@ class Constraint(CatVRSMetadataMixin, RootModel):
     root: (
         DefiningAlleleConstraint
         | DefiningLocationConstraint
+        | AdjacencyConstraint
+        | FeatureContextConstraint
         | CopyCountConstraint
         | CopyChangeConstraint
-        | FeatureContextConstraint
         | FunctionConstraint
     ) = Field(..., discriminator="type")
 

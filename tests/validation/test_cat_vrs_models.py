@@ -15,6 +15,7 @@ from ga4gh.core.models import (
     MappableConcept,
     code,
 )
+from ga4gh.vrs.models import SequenceLocation, Terminus
 
 DUMMY_ALLELE_IRI = "allele.json#/1"  # Valid IRI but does not reference anything
 
@@ -441,3 +442,47 @@ def test_function_variant(
     ]
     with pytest.raises(ValueError, match="List should have at least 2 items"):
         recipes.FunctionVariant(**invalid_params)
+
+
+def test_gene_fusion(members_and_name: dict):
+    """Test the GeneFusion adjacency requirements."""
+    location = SequenceLocation(sequenceReference="ga4gh:SQ.test", start=1, end=2)
+    terminus = Terminus(location=location)
+    valid_elements = [
+        "gene:partner",
+        MappableConcept(name="partner gene"),
+        location,
+        models.UnspecifiedElement(),
+    ]
+    for element in valid_elements:
+        valid_adjacency = models.AdjacencyConstraint(
+            adjoinedElements=[element, terminus], orderKnown=False
+        )
+        valid_params = deepcopy(members_and_name)
+        valid_params["constraints"] = [models.Constraint(root=valid_adjacency)]
+        assert recipes.GeneFusion(**valid_params)
+
+    invalid_adjacency = models.AdjacencyConstraint(
+        adjoinedElements=[terminus, terminus], orderKnown=True
+    )
+    invalid_params = deepcopy(members_and_name)
+    invalid_params["constraints"] = [models.Constraint(root=invalid_adjacency)]
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Must contain at least one `AdjacencyConstraint` whose "
+            "`adjoinedElements` contains an `iriReference`, `MappableConcept`, "
+            "`Location`, or `UnspecifiedElement`."
+        ),
+    ):
+        recipes.GeneFusion(**invalid_params)
+
+
+def test_functional_domain_status():
+    """Test functional domain status string-enum coercion."""
+    functional_domain = models.FunctionalDomain(
+        location=SequenceLocation(sequenceReference="ga4gh:SQ.test", start=1, end=2),
+        status="preserved",
+    )
+    assert functional_domain.status == "preserved"
+    assert functional_domain.model_dump(mode="json")["status"] == "preserved"
