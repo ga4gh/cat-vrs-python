@@ -9,6 +9,7 @@ from typing import ClassVar
 from pydantic import Field, field_validator
 
 from ga4gh.cat_vrs.models import (
+    AdjacencyConstraint,
     CategoricalVariant,
     Constraint,
     CopyChangeConstraint,
@@ -17,6 +18,7 @@ from ga4gh.cat_vrs.models import (
     DefiningLocationConstraint,
     FeatureContextConstraint,
     FunctionConstraint,
+    UnspecifiedElement,
 )
 from ga4gh.cat_vrs.relations import (
     LIFTOVER_TO_RELATION,
@@ -24,7 +26,8 @@ from ga4gh.cat_vrs.relations import (
     TRANSLATION_OF_RELATION,
 )
 from ga4gh.core.metadata import Maturity
-from ga4gh.core.models import MappableConcept
+from ga4gh.core.models import MappableConcept, iriReference
+from ga4gh.vrs.models import Location
 
 
 class ProteinSequenceConsequence(CategoricalVariant):
@@ -245,4 +248,42 @@ class FunctionVariant(CategoricalVariant):
             msg = "Must contain at least one of: `DefiningAlleleConstraint`, `DefiningLocationConstraint`, or `FeatureContextConstraint`."
             raise ValueError(msg)
 
+        return v
+
+
+class GeneFusion(CategoricalVariant):
+    """A representation of the joining of two genes resulting in a chimeric transcript
+    and/or novel interaction between a rearranged regulatory elements with the
+    expression of a partner gene product (a regulatory fusion).
+    """
+
+    _maturity: ClassVar[Maturity] = Maturity.DRAFT
+
+    constraints: list[Constraint] = Field(
+        ...,
+        min_length=1,
+        description="The constraints must contain at least one item of an Adjacency Constraint.",
+    )
+
+    @field_validator("constraints")
+    @classmethod
+    def validate_constraints(cls, v: list[Constraint]) -> list[Constraint]:
+        """Require an adjacency with at least one gene fusion element."""
+        if not any(
+            isinstance(constraint.root, AdjacencyConstraint)
+            and any(
+                isinstance(
+                    element,
+                    iriReference | MappableConcept | Location | UnspecifiedElement,
+                )
+                for element in constraint.root.adjoinedElements
+            )
+            for constraint in v
+        ):
+            msg = (
+                "Must contain at least one `AdjacencyConstraint` whose "
+                "`adjoinedElements` contains an `iriReference`, `MappableConcept`, "
+                "`Location`, or `UnspecifiedElement`."
+            )
+            raise ValueError(msg)
         return v
