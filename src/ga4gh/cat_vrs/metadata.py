@@ -1,10 +1,10 @@
 """Provide metadata mixins for Cat-VRS models."""
 
 from ga4gh.cat_vrs.version import CATVRS_VERSION
-from ga4gh.core.metadata import GKSMetadataMixin
+from ga4gh.core.metadata import GKMMetadataMixin
 
 
-class CatVRSMetadataMixin(GKSMetadataMixin):
+class CatVRSMetadataMixin(GKMMetadataMixin):
     """Provide metadata for a concrete Cat-VRS model."""
 
     _product_name = "cat-vrs"

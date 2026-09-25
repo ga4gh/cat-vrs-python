@@ -196,6 +196,7 @@ class Constraint(CatVRSMetadataMixin, RootModel):
     """Constraints are used to construct an intensional semantics of categorical variant types."""
 
     _maturity: ClassVar[Maturity] = Maturity.TRIAL_USE
+    _abstract: ClassVar[bool] = True
 
     root: (
         DefiningAlleleConstraint
