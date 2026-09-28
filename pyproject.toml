@@ -27,7 +27,7 @@ keywords = ["bioinformatics", "ga4gh", "genomics", "variation"]
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-  "ga4gh.vrs @ git+https://github.com/ga4gh/vrs-python@19ae3f2509200658125effb44c231c8aec8f109f",
+  "ga4gh.vrs @ git+https://github.com/ga4gh/vrs-python@fe45f7706e64459831d29e578b2958df1223f5cd",
   "pydantic>=2.0,<3.0",
 ]
 
