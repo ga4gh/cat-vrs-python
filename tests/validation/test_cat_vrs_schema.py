@@ -12,14 +12,14 @@ from ga4gh.cat_vrs import models, recipes
 
 
 class CatVrsSchema(str, Enum):
-    """Enum for Cat VRS schema"""
+    """Enum for Cat-VRS schemas."""
 
     CAT_VRS = "cat_vrs"
     RECIPES = "recipes"
 
 
 class CatVrsSchemaMapping(BaseModel):
-    """Model for representing Cat-VRS Schema concrete classes, primitives, and schema"""
+    """Represent Cat-VRS JSON Schema classes, primitives, and definitions."""
 
     base_classes: set = set()
     concrete_classes: set = set()
@@ -41,7 +41,7 @@ def _update_cat_vrs_schema_mapping(
     spec_class = cls_def["title"]
     cat_vrs_schema_mapping.cat_vrs_schema[spec_class] = cls_def
 
-    if "properties" in cls_def:
+    if "properties" in cls_def and not cls_def.get("abstract"):
         cat_vrs_schema_mapping.concrete_classes.add(spec_class)
     elif cls_def.get("type") in {"array", "integer", "string"}:
         cat_vrs_schema_mapping.primitives.add(spec_class)

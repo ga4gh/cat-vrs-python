@@ -1,39 +1,47 @@
-"""Test model metadata against the Cat-VRS source and JSON schemas."""
+"""Test model metadata against the Cat-VRS JSON schemas."""
 
 import json
 from pathlib import Path
 
 import pytest
-import yaml
+from pydantic import RootModel
 
 from ga4gh.cat_vrs import CATVRS_VERSION, models, recipes
 from ga4gh.core.metadata import Maturity
 
 SCHEMA_DIR = Path(__file__).parents[2] / "submodules" / "cat_vrs" / "schema" / "cat-vrs"
-SCHEMAS = (
-    (models, SCHEMA_DIR / "cat-vrs-source.yaml"),
-    (recipes, SCHEMA_DIR / "recipes-source.yaml"),
-)
+SCHEMAS = (models, recipes)
 JSON_DIR = SCHEMA_DIR / "json"
 
-with (SCHEMA_DIR / "cat-vrs-source.yaml").open() as source_file:
-    CATVRS_SOURCE = yaml.safe_load(source_file)
-
-SPEC_VERSION = CATVRS_SOURCE["$id"].split("/")[-2]
+with (JSON_DIR / "CategoricalVariant").open() as schema_file:
+    SPEC_VERSION = json.load(schema_file)["$id"].split("/")[-3]
 
 
-def _model_params():
-    """Return model metadata discovered from both source YAML files."""
+def _model_params(abstract: bool):
+    """Return model metadata discovered from JSON Schema files.
+
+    :param abstract: Whether to return abstract models.
+    :returns: Pytest parameters for matching Cat-VRS models and schemas.
+    """
     params = []
-    for model_module, source_path in SCHEMAS:
-        with source_path.open() as source_file:
-            definitions = yaml.safe_load(source_file)["$defs"]
-        for name, definition in definitions.items():
-            model = getattr(model_module, name)
-            with (JSON_DIR / name).open() as schema_file:
-                schema = json.load(schema_file)
-            params.append(pytest.param(model, definition, schema, id=name))
-    assert params, "No concrete Cat-VRS models discovered"
+    for schema_path in sorted(JSON_DIR.iterdir()):
+        with schema_path.open() as schema_file:
+            schema = json.load(schema_file)
+        if schema.get("abstract", False) is not abstract:
+            continue
+        model = next(
+            (
+                getattr(module, schema_path.name, None)
+                for module in SCHEMAS
+                if hasattr(module, schema_path.name)
+            ),
+            None,
+        )
+        if model is not None:
+            params.append(pytest.param(model, schema, id=schema_path.name))
+    assert (
+        params
+    ), f"No {'abstract' if abstract else 'concrete'} Cat-VRS models discovered"
     return params
 
 
@@ -42,17 +50,31 @@ def test_cat_vrs_version_matches_source_schema():
     assert CATVRS_VERSION == SPEC_VERSION
 
 
-@pytest.mark.parametrize(("model", "definition", "schema"), _model_params())
-def test_model_metadata(model, definition, schema):
-    """Model metadata matches its source and generated JSON Schemas."""
+@pytest.mark.parametrize(("model", "schema"), _model_params(abstract=False))
+def test_concrete_model_metadata(model, schema):
+    """Concrete model metadata matches its published JSON Schema."""
     expected_schema_id = (
         f"https://w3id.org/ga4gh/schema/cat-vrs/{SPEC_VERSION}/json/"
         f"{model.__name__}"
     )
     assert model.schema_id() == expected_schema_id
-    assert model.maturity() == Maturity(definition["maturity"])
+    assert model.maturity() == Maturity(schema["maturity"])
 
     generated_schema = model.model_json_schema()
     assert generated_schema["$id"] == expected_schema_id
     assert generated_schema["maturity"] == schema["maturity"]
     assert "ga4gh" not in generated_schema
+
+
+@pytest.mark.parametrize(("model", "schema"), _model_params(abstract=True))
+def test_abstract_model_metadata(model, schema):
+    """Abstract compatibility adapters expose published JSON Schema metadata."""
+    assert model.maturity() == Maturity(schema["maturity"])
+
+    generated_schema = model.model_json_schema()
+    assert generated_schema["$id"] == schema["$id"]
+    assert generated_schema["maturity"] == schema["maturity"]
+    assert generated_schema["abstract"] is True
+    if issubclass(model, RootModel):
+        assert generated_schema["discriminator"]["propertyName"] == "type"
+        assert len(generated_schema["oneOf"]) == len(schema["oneOf"])
