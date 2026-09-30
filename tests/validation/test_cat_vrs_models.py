@@ -331,7 +331,7 @@ def test_categorical_cnv(
     ]
     with pytest.raises(
         ValueError,
-        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
+        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gkm-term:allele-relation'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
@@ -354,7 +354,7 @@ def test_categorical_cnv(
         MappableConcept(
             primaryCoding=Coding(
                 code=code("transcribed_to"),
-                system="ga4gh-gks-term:allele-relation",
+                system="ga4gh-gkm-term:allele-relation",
             )
         )
     ]
@@ -364,7 +364,7 @@ def test_categorical_cnv(
     ]
     with pytest.raises(
         ValueError,
-        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gks-term:allele-relation'.",
+        match="`DefiningLocationConstraint` found, but must contain at least one relation where `primaryCoding.code` is 'liftover_to' and `primaryCoding.system` is 'ga4gh-gkm-term:allele-relation'.",
     ):
         recipes.CategoricalCnv(**invalid_params)
 
