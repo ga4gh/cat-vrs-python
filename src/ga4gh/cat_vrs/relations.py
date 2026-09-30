@@ -19,7 +19,7 @@ class SystemUri(str, Enum):
     """Define constraints for systems used in relations"""
 
     SEQUENCE_ONTOLOGY = "http://www.sequenceontology.org"
-    GKS_ALLELE_RELATION = "ga4gh-gks-term:allele-relation"
+    GKS_ALLELE_RELATION = "ga4gh-gkm-term:allele-relation"
 
 
 def _build_relation_concept(relation: Relation, system: SystemUri) -> MappableConcept:
